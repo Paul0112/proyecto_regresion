@@ -1,0 +1,187 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% IMPORTANTE: Compilar con XeLaTeX
+% Proyecto aplicado - Análisis de Regresión EYP2307
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{style}
+
+%%%%%%%%%%%%%%%%% CONFIGURACIONES GENERALES %%%%%%%%%%%%%%%%%
+\graphicspath{{./figures/}{./img/}}
+
+\renewcommand{\contentsname}{Índice de contenido}
+\renewcommand{\listfigurename}{Índice de figuras}
+\renewcommand{\listtablename}{Índice de tablas}
+\renewcommand{\tablename}{Tabla}
+\renewcommand{\figurename}{Figura}
+
+\newcommand{\var}[1]{\texttt{#1}}
+\setstretch{1.03}
+\setlength{\parskip}{0.25em}
+
+%%%%%%%%%%%%%%%%% DOCUMENTO %%%%%%%%%%%%%%%%%
+\begin{document}
+
+% Se deja el encabezado UC dentro del cuerpo del documento para asegurar que el logo se vea.
+\pagestyle{plain}
+
+%%%%%%%%%%%%%%%%% BLOQUE SUPERIOR UC %%%%%%%%%%%%%%%%%
+\noindent
+\begin{minipage}{0.14\textwidth}
+    \includegraphics[width=1.8cm]{img/logo-uc-3.pdf}
+\end{minipage}
+\hfill
+\begin{minipage}{0.82\textwidth}
+    {\small
+    \textsc{Pontificia Universidad Católica de Chile}\\
+    \textsc{Facultad de Matemáticas}\\
+    \textsc{Departamento de Estadística}\\
+    \textsc{EYP2307 -- Análisis de Regresión}
+    }
+\end{minipage}
+
+\vspace{0.35cm}
+\hrule
+\vspace{0.35cm}
+
+\begin{center}
+    {\Large \textbf{Avance Proyecto de Regresión: Magnitud de eventos sísmicos USGS 2024}}\\[0.2cm]
+    {\normalsize Primer Semestre 2026}
+\end{center}
+
+\vspace{0.2cm}
+
+%%%%%%%%%%%%%%%%% 1. PREGUNTA Y CONTEXTO %%%%%%%%%%%%%%%%%
+\section{Pregunta y contexto}
+
+La pregunta de investigación es: \textbf{¿Cómo se asocia la magnitud de los eventos sísmicos registrados por USGS durante 2024 con su profundidad, localización geográfica y características técnicas del registro?}
+
+La variable respuesta es la magnitud reportada del evento, \var{mag}. El enfoque del proyecto es descriptivo-explicativo: se busca estimar asociaciones promedio dentro del catálogo observado, no predecir terremotos futuros ni construir un sistema operacional de alerta. La pregunta es abordable con regresión lineal porque la respuesta es numérica y los predictores candidatos incluyen variables continuas, transformaciones y variables categóricas representables mediante indicadores.
+
+La interpretación de fondo se centra en cómo varía la magnitud reportada según profundidad, posición geográfica y características técnicas del registro sísmico. Una limitación central es que la muestra está truncada a eventos con magnitud al menos 4, por lo que las conclusiones no se extrapolan a sismos menores ni al proceso sísmico completo.
+
+%%%%%%%%%%%%%%%%% 2. FUENTE, DATOS Y ÉTICA %%%%%%%%%%%%%%%%%
+\section{Fuente, datos y ética}
+
+La fuente es el \textit{USGS Earthquake Catalog}, catálogo oficial y público del \textit{U.S. Geological Survey}. La unidad de observación es un evento sísmico registrado durante 2024 con \var{mag} mayor o igual a 4. Después de la limpieza inicial se mantienen 14.176 eventos. Los predictores candidatos son \var{depth}, \var{latitude}, \var{longitude}, \var{nst}, \var{gap}, \var{dmin}, \var{rms}, \var{magType}, \var{net}, \var{month}, \var{hour} y una región aproximada derivada desde \var{place}.
+
+\input{tables/ficha_datos.tex}
+
+Los datos no contienen información personal y el riesgo ético directo es bajo. Aun así, el uso responsable exige evitar conclusiones de seguridad pública, alertas o lenguaje de predicción operacional. Las variables técnicas pueden asociarse con la magnitud reportada, pero no se interpretan como causas físicas directas.
+
+\begin{table}[H]
+\centering
+\caption{Estructura de variables principales en la base analítica}
+\scriptsize
+\begin{tabularx}{\textwidth}{lllX}
+\toprule
+Variable & Tipo & Rol & Justificación de uso \\
+\midrule
+\var{mag} & Numérica & Respuesta & Magnitud reportada del evento sísmico. \\
+\var{depth} & Numérica & Predictor & Profundidad del evento; variable geofísica básica. \\
+\var{log\_depth\_plus\_1} & Numérica & Transformación & Se agrega porque \var{depth} puede ser asimétrica y su relación con \var{mag} no necesariamente es lineal. La transformación logarítmica reduce el peso de profundidades extremas y permite una relación más estable. \\
+\var{latitude}, \var{longitude} & Numéricas & Predictores & Capturan localización espacial del epicentro. \\
+\var{nst}, \var{gap}, \var{dmin}, \var{rms} & Numéricas & Técnicas & Resumen cobertura y ajuste del registro sísmico. \\
+\var{magType}, \var{net} & Categóricas & Indicadores & Permiten comparar diferencias promedio por tipo de magnitud y red de reporte. \\
+\var{region\_from\_place} & Categórica derivada & Apoyo descriptivo & Se agrega para resumir el texto \var{place} en una categoría geográfica interpretable. No reemplaza latitud-longitud, pero ayuda a describir regiones frecuentes y posibles diferencias por zona. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+%%%%%%%%%%%%%%%%% 3. LIMPIEZA INICIAL Y EDA %%%%%%%%%%%%%%%%%
+\section{Limpieza inicial y EDA}
+
+La limpieza inicial convierte \var{time} a fecha-hora UTC, fuerza variables numéricas con \var{errors="coerce"}, deriva \var{month}, \var{hour}, \var{weekday}, crea \var{log\_depth\_plus\_1} como una transformación logarítmica de \var{depth}, y extrae \var{region\_from\_place} desde el texto de localización. Se revisan duplicados por \var{id}, rangos plausibles y faltantes. No se eliminan automáticamente valores atípicos de magnitud o profundidad; para los modelos preliminares se usa eliminación por lista solo en las variables de cada fórmula.
+
+\input{tables/cleaning_summary.tex}
+
+La revisión confirma que no hay duplicados por \var{id}. Los faltantes principales se concentran en \var{dmin}, \var{gap}, \var{nst} y \var{rms}, mientras que \var{mag}, \var{depth}, \var{latitude} y \var{longitude} no presentan faltantes en la base procesada. Las variables categóricas \var{magType}, \var{net} y \var{region\_from\_place} se agrupan conservando niveles frecuentes y reuniendo categorías escasas como \textit{Other}; esto reduce indicadores con pocas observaciones y mejora la estabilidad de los modelos lineales preliminares.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\textwidth]{fig_covariate_distributions.png}
+\caption{Distribuciones de covariables candidatas para los modelos. Las numéricas se muestran con histogramas y las categóricas agrupadas con barras; en variables muy asimétricas se usa el rango p1--p99 solo para visualización, sin eliminar observaciones de la base analítica.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{fig_hist_mag.png}
+    \caption{Distribución de \var{mag}.}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{fig_scatter_mag_logdepth.png}
+    \caption{\var{mag} y log profundidad.}
+\end{subfigure}
+
+\vspace{0.1cm}
+
+\begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{fig_map_mag.png}
+    \caption{Ubicación coloreada por magnitud.}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{fig_box_mag_magtype.png}
+    \caption{Magnitud por \var{magType}.}
+\end{subfigure}
+\caption{EDA principal ligado a la pregunta: distribución de la respuesta, asociación con profundidad transformada, patrón espacial y diferencias promedio por tipo de magnitud.}
+\end{figure}
+
+El EDA está directamente conectado con la pregunta de investigación. La magnitud aparece concentrada cerca del umbral 4 por el filtro de inclusión, por lo que las asociaciones se interpretan dentro de eventos moderados o mayores. El mapa muestra concentración espacial de eventos, lo que justifica incluir latitud y longitud como controles; además, las diferencias promedio por \var{magType} respaldan incorporar indicadores de tipo de magnitud. Estas relaciones son descriptivas y no se leen como efectos causales.
+
+Las distribuciones de covariables complementan esta lectura: \var{depth}, \var{dmin}, \var{nst}, \var{gap} y \var{rms} muestran escalas y asimetrías distintas, lo que respalda revisar transformaciones y diagnósticos; las barras de \var{magType}, \var{net} y región muestran por qué conviene agrupar niveles poco frecuentes antes de usar indicadores.
+
+%%%%%%%%%%%%%%%%% 4. PLAN DE MODELOS %%%%%%%%%%%%%%%%%
+\section{Plan de modelos}
+
+El avance considera una secuencia de modelos lineales interpretables. M1 evalúa la asociación marginal con profundidad transformada; M2 agrega ubicación básica mediante latitud y longitud; M3 incorpora variables técnicas del registro; M4 agrega diferencias promedio por tipo de magnitud; M5 revisa si la red de reporte captura diferencias adicionales; y M6 permite una relación espacial flexible con términos cuadráticos e interacción latitud-longitud, sin salir del marco de regresión lineal. Estas comparaciones evalúan qué bloque de variables aporta evidencia preliminar, controlando por las demás variables incluidas.
+
+\begin{table}[H]
+\centering
+\caption{Bloques de modelos lineales candidatos}
+\scriptsize
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+Modelo & Bloque agregado & Propósito estadístico \\
+\midrule
+M1 & Profundidad transformada & Evaluar asociación marginal entre magnitud y profundidad. \\
+M2 & Ubicación geográfica & Controlar por latitud y longitud del evento. \\
+M3 & Variables técnicas & Incorporar cobertura y ajuste del registro sísmico. \\
+M4 & Tipo de magnitud & Comparar diferencias promedio según método de magnitud. \\
+M5 & Red de reporte & Evaluar diferencias adicionales asociadas a la institución reportante. \\
+M6 & Términos espaciales flexibles & Permitir curvatura espacial mediante latitud, longitud, cuadrados e interacción. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\input{tables/model_comparison.tex}
+
+La comparación preliminar sugiere mejoras importantes al pasar de modelos puramente geográficos a modelos con variables técnicas y tipo de magnitud. Sin embargo, el modelo final no se escogerá solo por R2 o AIC/BIC: se priorizará interpretabilidad, diagnóstico de supuestos, colinealidad, observaciones influyentes y estabilidad ante categorías agrupadas. Dentro de esta etapa, M4 y M6 son candidatos naturales para diagnóstico inicial.
+
+%%%%%%%%%%%%%%%%% 5. DIAGNÓSTICOS %%%%%%%%%%%%%%%%%
+\section{Diagnósticos previstos y siguientes pasos}
+
+En el informe final se revisarán residuos contra ajustados, normalidad aproximada mediante QQ-plot e histograma, heterocedasticidad potencial, distancia de Cook, leverage con residuos estudentizados y VIF para predictores numéricos principales. También se evaluará si quedan patrones espaciales en residuos. Dado que los datos son eventos puntuales, un modelo CAR no es el enfoque directo salvo que se agreguen observaciones por áreas o grillas; el foco del curso seguirá siendo regresión lineal múltiple, selección razonada de variables, inferencia y análisis de residuos.
+
+Como análisis de sensibilidad se contrastarán decisiones razonables de transformación y especificación, por ejemplo usar \var{depth} versus \var{log\_depth\_plus\_1}, incluir o no variables técnicas con faltantes, y revisar la estabilidad de conclusiones ante observaciones influyentes. Esto permitirá distinguir patrones descriptivos robustos de resultados dependientes de una codificación particular.
+
+%%%%%%%%%%%%%%%%% 6. REPRODUCIBILIDAD %%%%%%%%%%%%%%%%%
+\section{Reproducibilidad}
+
+El notebook \var{avance\_proyecto\_regresion.ipynb} genera la base procesada \var{usgs\_earthquakes\_2024\_mag4\_model\_ready.csv}, las tablas en \var{Plantilla\_informe/tables/} y las figuras en \var{Plantilla\_informe/figures/}. El repositorio del proyecto está disponible en \url{https://github.com/Paul0112/proyecto_regresion}. Se documentan versiones de paquetes en \var{requirements.txt} y \var{session\_info.txt}.
+
+%%%%%%%%%%%%%%%%% REFERENCIAS %%%%%%%%%%%%%%%%%
+\section*{Referencias}
+
+\begin{enumerate}
+    \item U.S. Geological Survey. \textit{Earthquake Catalog API}. Disponible en \url{https://earthquake.usgs.gov/fdsnws/event/1/}.
+    \item Python Software Foundation. \textit{Python Language Reference}. Disponible en \url{https://www.python.org/}. El análisis usa Python para limpieza, visualización y ajuste de modelos.
+    \item Declaración de herramientas: se usaron herramientas computacionales de Python para limpieza, visualización y ajuste de modelos. Los resultados numéricos provienen de la ejecución reproducible del notebook sobre los datos locales.
+\end{enumerate}
+
+\end{document}

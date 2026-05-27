@@ -1,0 +1,8 @@
+modelo,fórmula resumida,n usado,n parámetros,R2,R2 ajustado,AIC,BIC,RMSE in-sample,MAE in-sample,nota
+M0,Nulo,14176,1,-0.0,-0.0,12498.9873,12506.5466,0.376,0.2724,Ajustado
+M1,Profundidad log,14176,2,0.0282,0.0281,12096.0224,12111.141,0.3707,0.2683,Ajustado
+M2,Profundidad + ubicación,14176,4,0.0484,0.0482,11801.6952,11831.9325,0.3668,0.2643,Ajustado
+M3,Geografía + técnicas,14124,8,0.5355,0.5353,1633.6334,1694.0785,0.2562,0.1845,Ajustado
+M4,M3 + tipo magnitud,14124,15,0.6246,0.6243,-1361.2024,-1247.8679,0.2303,0.1704,Ajustado
+M5,M4 + red,14124,22,0.6258,0.6252,-1390.2524,-1224.0285,0.23,0.1703,Ajustado
+M6,Espacial flexible,14124,18,0.6334,0.6329,-1688.3523,-1552.3509,0.2276,0.1679,Ajustado

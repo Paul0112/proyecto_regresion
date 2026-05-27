@@ -1,0 +1,23 @@
+\begin{tabular}{llll}
+\toprule
+variable & tipo & descripción & uso en el análisis \\
+\midrule
+mag & Numérica continua & Magnitud reportada del evento sísmico. & Variable respuesta. \\
+depth & Numérica continua & Profundidad del evento, usualmente en kilómetros según catálogo USGS. & Predictor geofísico principal. \\
+log\_depth\_plus\_1 & Numérica transformada & log(depth + 1), calculado como log1p(depth.clip(lower=0)). & Transformación para reducir asimetría de profundidad. \\
+latitude & Numérica continua & Latitud del epicentro. & Localización geográfica. \\
+longitude & Numérica continua & Longitud del epicentro. & Localización geográfica. \\
+nst & Numérica discreta & Número de estaciones usadas en la solución del evento. & Característica técnica del registro. \\
+gap & Numérica continua & Brecha azimutal de cobertura de estaciones. & Característica técnica del registro. \\
+dmin & Numérica continua & Distancia mínima a una estación reportante. & Característica técnica del registro. \\
+rms & Numérica continua & Error RMS del ajuste del evento. & Característica técnica del registro. \\
+month & Numérica discreta & Mes UTC del evento derivado desde time. & Control temporal descriptivo. \\
+hour & Numérica discreta & Hora UTC del evento derivada desde time. & Control temporal descriptivo. \\
+magType & Categórica & Tipo de magnitud reportada. & Diferencias sistemáticas por escala de magnitud. \\
+net & Categórica & Red u organismo que reporta el evento. & Diferencias sistemáticas por red de reporte. \\
+region\_from\_place & Categórica derivada & Región aproximada extraída desde el texto place. & Resumen geográfico categórico. \\
+place & Texto & Descripción textual del lugar del evento. & Contexto y construcción de región. \\
+time & Fecha-hora & Fecha y hora UTC del evento. & Filtro temporal y variables derivadas. \\
+id & Identificador & Identificador único del evento en el catálogo. & Control de duplicados. \\
+\bottomrule
+\end{tabular}

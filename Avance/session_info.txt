@@ -1,0 +1,14 @@
+Python: 3.13.1
+Ruta relativa de datos: Avance/usgs_earthquakes_2024_mag4_raw.csv
+Figuras del informe: Avance/Plantilla_informe/figures/
+Tablas del informe: Avance/Plantilla_informe/tables/
+
+Paquetes principales:
+pandas: 2.2.3
+numpy: 2.2.1
+matplotlib: 3.10.0
+seaborn: 0.13.2
+statsmodels: 0.14.4
+scipy: 1.15.1
+nbformat: 5.10.4
+nbclient: 0.10.2

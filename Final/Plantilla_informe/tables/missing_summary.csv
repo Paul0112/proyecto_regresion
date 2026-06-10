@@ -1,0 +1,19 @@
+variable,n_missing,pct_missing,tipo_dato,n_unique
+dmin,52,0.37,float64,6546
+gap,52,0.37,float64,279
+nst,51,0.36,float64,299
+rms,1,0.01,float64,150
+depth,0,0.0,float64,8359
+hour,0,0.0,int32,24
+id,0,0.0,object,14176
+latitude,0,0.0,float64,14042
+log_depth_plus_1,0,0.0,float64,8359
+longitude,0,0.0,float64,14035
+mag,0,0.0,float64,88
+magType,0,0.0,object,8
+month,0,0.0,int32,12
+net,0,0.0,object,11
+place,0,0.0,object,9865
+region_from_place,0,0.0,string,149
+time,0,0.0,"datetime64[ns, UTC]",14176
+weekday,0,0.0,object,7

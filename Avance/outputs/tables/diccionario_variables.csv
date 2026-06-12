@@ -1,18 +1,21 @@
 variable,tipo,descripción,uso en el análisis
-mag,Numérica continua,Magnitud reportada del evento sísmico.,Variable respuesta.
-depth,Numérica continua,"Profundidad del evento, usualmente en kilómetros según catálogo USGS.",Predictor geofísico principal.
-log_depth_plus_1,Numérica transformada,"log(depth + 1), calculado como log1p(depth.clip(lower=0)).",Transformación para reducir asimetría de profundidad.
-latitude,Numérica continua,Latitud del epicentro.,Localización geográfica.
-longitude,Numérica continua,Longitud del epicentro.,Localización geográfica.
-nst,Numérica discreta,Número de estaciones usadas en la solución del evento.,Característica técnica del registro.
-gap,Numérica continua,Brecha azimutal de cobertura de estaciones.,Característica técnica del registro.
-dmin,Numérica continua,Distancia mínima a una estación reportante.,Característica técnica del registro.
-rms,Numérica continua,Error RMS del ajuste del evento.,Característica técnica del registro.
-month,Numérica discreta,Mes UTC del evento derivado desde time.,Control temporal descriptivo.
-hour,Numérica discreta,Hora UTC del evento derivada desde time.,Control temporal descriptivo.
-magType,Categórica,Tipo de magnitud reportada.,Diferencias sistemáticas por escala de magnitud.
-net,Categórica,Red u organismo que reporta el evento.,Diferencias sistemáticas por red de reporte.
-region_from_place,Categórica derivada,Región aproximada extraída desde el texto place.,Resumen geográfico categórico.
-place,Texto,Descripción textual del lugar del evento.,Contexto y construcción de región.
-time,Fecha-hora,Fecha y hora UTC del evento.,Filtro temporal y variables derivadas.
-id,Identificador,Identificador único del evento en el catálogo.,Control de duplicados.
+mag,Numérica continua,Magnitud reportada del evento sísmico en el catálogo USGS.,Variable respuesta; se analiza solo dentro de la muestra truncada con mag >= 4.
+depth,Numérica continua,"Profundidad estimada del evento, usualmente en kilómetros según USGS.",Predictor geofísico interpretable; permite revisar si la magnitud reportada cambia con la profundidad del evento.
+log_depth_plus_1,Numérica transformada,"log(depth + 1), calculado como log1p(depth.clip(lower=0)).",Transformación usada porque depth es asimétrica y tiene valores extremos; estabiliza la relación lineal.
+latitude,Numérica continua,Latitud del epicentro del evento.,Control espacial; captura diferencias promedio asociadas a la ubicación norte-sur.
+longitude,Numérica continua,Longitud del epicentro del evento.,Control espacial; junto con latitude resume patrones geográficos del catálogo.
+nst,Numérica discreta,Número de estaciones utilizadas para localizar o caracterizar el evento.,Variable técnica de cobertura: más estaciones pueden asociarse con eventos mejor registrados o de mayor alcance.
+gap,Numérica continua,Brecha azimutal de estaciones alrededor del epicentro; valores mayores indican peor cobertura angular.,Variable técnica de geometría del registro; ayuda a controlar diferencias de calidad/cobertura.
+dmin,Numérica continua,Distancia mínima entre el evento y una estación reportante.,Variable técnica de proximidad del registro; puede asociarse con precisión y disponibilidad de información.
+rms,Numérica continua,Error cuadrático medio del ajuste del evento reportado por el catálogo.,"Variable técnica de ajuste; se incluye como característica del registro, no como causa física directa."
+month,Numérica discreta,Mes UTC derivado desde time.,Control temporal descriptivo para revisar estacionalidad o cambios de composición del catálogo.
+hour,Numérica discreta,Hora UTC derivada desde time.,Control temporal descriptivo; no es predictor físico central.
+magType,Categórica,"Tipo o escala de magnitud reportada, por ejemplo mb, mww u otras codificaciones.",Permite comparar diferencias promedio por método de medición/codificación.
+magType_grouped,Categórica agrupada,Versión agrupada de magType que conserva niveles frecuentes y reúne niveles escasos como Other.,Reduce dummies con pocas observaciones y mejora estabilidad del modelo lineal.
+net,Categórica,Red u organismo que reporta el evento.,Controla diferencias promedio asociadas a la institución o red de reporte.
+net_grouped,Categórica agrupada,Versión agrupada de net que conserva redes frecuentes y reúne niveles escasos como Other.,Evita categorías con muy poca información en los modelos con indicadores.
+region_from_place,Categórica derivada,Región aproximada extraída desde el texto place.,Resumen geográfico interpretable para EDA; no reemplaza latitude-longitude.
+region_grouped,Categórica agrupada,Versión agrupada de region_from_place.,Permite describir regiones frecuentes sin saturar tablas o gráficos con niveles raros.
+place,Texto,Descripción textual del lugar del evento.,Contexto y construcción de region_from_place.
+time,Fecha-hora,Fecha y hora UTC del evento.,Filtro del año 2024 y creación de variables temporales.
+id,Identificador,Identificador único del evento en el catálogo USGS.,Control de duplicados.

@@ -1,0 +1,8 @@
+revisión,resultado
+Duplicados por id,0 registros involucrados (0 ids duplicados).
+Rango observado de mag,4.0 a 7.5
+Rango observado de depth,-0.070 a 671.043
+Rango observado de latitude,-65.301 a 86.605
+Rango observado de longitude,-179.999 a 179.998
+Profundidades negativas,1 evento; se reporta y no se elimina automáticamente.
+Faltantes principales,dmin: 52 (0.37%); gap: 52 (0.37%); nst: 51 (0.36%); rms: 1 (0.01%)

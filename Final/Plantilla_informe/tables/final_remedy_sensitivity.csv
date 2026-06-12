@@ -1,0 +1,3 @@
+Alternativa,RMSE en mag,BP p-valor,Uso
+MCO final + HC3,0.2153,<0.001,Principal
+WLS por varianza estimada,0.2156,<0.001,Sensibilidad; heterocedasticidad persiste

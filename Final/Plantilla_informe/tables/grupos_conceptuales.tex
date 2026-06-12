@@ -1,9 +1,9 @@
-\begin{tabular}{llll}
+\begin{tabular}{lll}
 \toprule
-Grupo Conceptual & Variables Incluidas & Justificación Metodológica \\
+Grupo conceptual & Variables incluidas & Justificación metodológica \\
 \midrule
-1. Características Geofísicas & depth, latitude, longitude & Describen los determinantes espaciales físicos y la mecánica pura del evento tectónico. \\
-2. Condiciones Técnicas del Registro & nst, gap, dmin, rms & Capturan la calidad, geometría y precisión temporal de la red instrumental que detectó el sismo. \\
-3. Controles Metodológicos & magType, net & Aíslan las diferencias sistemáticas o sesgos atribuibles al algoritmo de medición y a la agencia reportante. \\
+1. Características geofísicas y espaciales & depth, depth², latitude, longitude & Describen profundidad y ubicación; log\_depth\_plus\_1 se conserva como sensibilidad, no como predictor final. \\
+2. Características técnicas del registro & log1p(nst), log1p(gap), log1p(dmin), rms & Resumen cobertura, geometría, proximidad y ajuste; sus escalas se seleccionan mediante comparaciones justificadas. \\
+3. Controles de codificación del catálogo & magType\_grouped, net\_grouped & Permiten estimar diferencias promedio por método de magnitud y red reportante mediante indicadores k-1. \\
 \bottomrule
 \end{tabular}

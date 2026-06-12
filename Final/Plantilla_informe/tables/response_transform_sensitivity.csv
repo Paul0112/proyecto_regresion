@@ -1,0 +1,5 @@
+Transformación,lambda,BP p-valor,RESET p-valor,JB p-valor
+Identidad,1.0,<0.001,<0.001,<0.001
+Raíz,0.5,<0.001,0.006,<0.001
+Log,0.0,<0.001,0.346,<0.001
+Perfil,-2.475,<0.001,<0.001,<0.001

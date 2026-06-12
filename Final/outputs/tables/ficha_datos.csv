@@ -1,0 +1,9 @@
+campo,descripción
+Fuente,"U.S. Geological Survey, Earthquake Catalog API."
+Contexto,Eventos sísmicos registrados durante 2024 con magnitud al menos 4.
+Unidad de observación,Evento sísmico registrado en el catálogo.
+Variable dependiente numérica,Magnitud del evento (mag).
+Predictores candidatos,"depth, latitude, longitude, nst, gap, dmin, rms, magType, net, month, hour y region_from_place."
+Tamaño muestral,"14,176 eventos después de la limpieza inicial."
+Datos faltantes,dmin (0.37%); gap (0.37%); nst (0.36%); rms (0.01%)
+Dificultades del análisis,Truncamiento por mag >= 4; asimetría o concentración de magnitudes; valores atípicos; faltantes en variables técnicas; posible colinealidad; dependencia espacial; categóricas con muchas categorías; variables técnicas no necesariamente causales.

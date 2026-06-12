@@ -1,0 +1,6 @@
+Especificación,Parámetros,R2 ajustado,AIC,BIC,RMSE,CV RMSE
+depth lineal,22,0.6662,-3026.3405,-2860.1166,0.217,0.2178
+depth + depth²,23,0.6715,-3248.8641,-3075.0846,0.2153,0.2161
+log1p(depth.clip(0)) lineal,22,0.6648,-2966.1437,-2799.9198,0.2175,0.2184
+log1p(depth.clip(0)) + cuadrado,23,0.671,-3230.0318,-3056.2523,0.2155,0.2162
+log1p(depth) + cuadrado,23,0.671,-3230.001,-3056.2215,0.2155,0.2162

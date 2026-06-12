@@ -3,14 +3,14 @@
 variable & tipo & descripción & uso en el análisis \\
 \midrule
 mag & Numérica continua & Magnitud reportada del evento sísmico. & Variable respuesta. \\
-depth & Numérica continua & Profundidad del evento, usualmente en kilómetros según catálogo USGS. & Predictor geofísico principal. \\
-log\_depth\_plus\_1 & Numérica transformada & log(depth + 1), calculado como log1p(depth.clip(lower=0)). & Transformación para reducir asimetría de profundidad. \\
+depth & Numérica continua & Profundidad del evento, usualmente en kilómetros según catálogo USGS. & Predictor final en escala original, con término lineal y cuadrático. \\
+log\_depth\_plus\_1 & Numérica transformada & log(depth + 1), calculado como log1p(depth.clip(lower=0)). & Especificación candidata y análisis de sensibilidad; no se adopta en el modelo final. \\
 latitude & Numérica continua & Latitud del epicentro. & Localización geográfica. \\
 longitude & Numérica continua & Longitud del epicentro. & Localización geográfica. \\
-nst & Numérica discreta & Número de estaciones usadas en la solución del evento. & Característica técnica del registro. \\
-gap & Numérica continua & Brecha azimutal de cobertura de estaciones. & Característica técnica del registro. \\
-dmin & Numérica continua & Distancia mínima a una estación reportante. & Característica técnica del registro. \\
-rms & Numérica continua & Error RMS del ajuste del evento. & Característica técnica del registro. \\
+nst & Numérica discreta & Número de estaciones usadas en la solución del evento. & Característica técnica; el modelo final usa log1p(nst). \\
+gap & Numérica continua & Brecha azimutal de cobertura de estaciones. & Característica técnica; el modelo final usa log1p(gap) y su cuadrado. \\
+dmin & Numérica continua & Distancia mínima a una estación reportante. & Característica técnica; el modelo final usa log1p(dmin) y su cuadrado. \\
+rms & Numérica continua & Error RMS del ajuste del evento. & Característica técnica conservada en su escala original. \\
 month & Numérica discreta & Mes UTC del evento derivado desde time. & Control temporal descriptivo. \\
 hour & Numérica discreta & Hora UTC del evento derivada desde time. & Control temporal descriptivo. \\
 magType & Categórica & Tipo de magnitud reportada. & Diferencias sistemáticas por escala de magnitud. \\

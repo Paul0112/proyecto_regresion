@@ -16,6 +16,7 @@
 \addto\captionsspanish{\renewcommand{\tablename}{Tabla}\renewcommand{\figurename}{Figura}}
 
 \newcommand{\var}[1]{\texttt{#1}}
+\setcitestyle{numbers,square}
 \setstretch{1.03}
 \setlength{\parskip}{0.25em}
 \emergencystretch=2em
@@ -49,7 +50,7 @@
 \vspace{0.35cm}
 
 \begin{center}
-    {\Large \textbf{Proyecto de Regresión: Magnitud de eventos sísmicos USGS 2024}}\\[0.2cm]
+    {\Large \textbf{Informe final: Magnitud de eventos sísmicos USGS 2024}}\\[0.2cm]
     {\normalsize Primer Semestre 2026}
 \end{center}
 
@@ -59,17 +60,23 @@
 
 \vspace{0.2cm}
 
+\subsection*{Resumen técnico}
+
+Sobre 14.124 eventos con información completa, la especificación final conserva \var{mag} en su escala original y utiliza profundidad estandarizada con término cuadrático, controles espaciales, transformaciones $\log(x+1)$ para \var{nst}, \var{gap} y \var{dmin}, \var{rms} sin transformar e indicadores de \var{magType}. Esta forma mejora el ajuste y la validación respecto de M4 ($R^2$ ajustado 0.6715; CV-RMSE 0.216), pero no elimina heterocedasticidad, colas residuales pesadas ni dependencia geográfica o temporal.
+
+Por ello, la inferencia principal emplea errores estándar HC3 y se contrasta con agrupación por región. Las conclusiones describen asociaciones promedio dentro del catálogo USGS 2024 truncado en magnitud 4; no establecen causalidad ni permiten anticipar sismos.
+
 %%%%%%%%%%%%%%%%% 1. PREGUNTA Y CONTEXTO %%%%%%%%%%%%%%%%%
 \section{Pregunta y contexto}
 
 
-Los sismos representan una de las amenazas naturales con mayor potencial destructivo en el mundo, siendo un terremoto de gran magnitud en una zona urbana uno de los peores desastres naturales que pueden ocurrir en nuestra sociedad \cite{paho_terremotos_2026}. Por esta razón, el estudio y comprensión de los  factores físicos, instrumentales y estructurales asociadas a la magnitud de un evento sísmico es de suma importancia, tanto desde un punto vista científico (en materia de geofísica) como socioambiental. Comprender las variables asociadas al suceso es fundamental para la mitigación de riesgos y para una buena respuesta post-desastre; subestimar la magnitud de un evento sísmico puede ocasionar una asignación insuficiente de recursos en el manejo de la emergencia, mientras que sobrestimarla podría generar un pánico injustificado para la población y paralizaciones económicas innecesarias \cite{minson2019}.
+Los sismos constituyen una amenaza natural relevante por sus posibles efectos humanos, materiales y territoriales \cite{paho_terremotos_2026}. Su magnitud resume el tamaño instrumental del evento, pero el valor publicado forma parte de un catálogo construido a partir de redes de estaciones, métodos de cálculo y procedimientos de revisión. Por ello, además de describir la distribución de magnitudes, resulta estadísticamente pertinente examinar cómo esta se relaciona con la profundidad, la ubicación y las características del registro.
 
-Luego, para poder estudiar el fenómeno con un rigor empírico, es indispensable el uso de datos fidedignos y estandarizados. En este caso, el estudio presente utiliza el catálogo oficial del U.S. Geological Survey (USGS)\cite{usgs}, garantizando que el análisis se construya sobre reglas estrictas  de calibración instrumental. Además, dado que la magnitud reportada es una estimación sujeta a la calidad de la red de monitoreo, resulta crucial separar la física del sismo del ruido técnico de su registro.
+El presente estudio utiliza el \textit{USGS Earthquake Catalog}, fuente pública y estandarizada del U.S. Geological Survey \cite{usgs}. El catálogo permite conectar una pregunta de interés geofísico con variables observables y comparables entre eventos. El análisis se concentra en asociaciones dentro de la muestra y reconoce que las variables técnicas describen el proceso de registro; no se interpretan como mecanismos físicos causales del sismo.
 
 En base a la problemática expuesta, se plantea la siguiente pregunta de investigación: \textbf{¿Cómo se asocia la magnitud de los eventos sísmicos registrados por USGS durante 2024 con su profundidad, localización geográfica y características técnicas del registro?}
 
-Respecto a los datos utilizados, la variable respuesta es la magnitud reportada del evento, \var{mag}. El enfoque del proyecto es \textit{descriptivo-explicativo}: se busca estimar asociaciones promedio dentro del catálogo observado, no predecir terremotos futuros ni construir un sistema operacional de alerta. Luego, la pregunta es abordable con regresión lineal porque la respuesta es numérica y los predictores candidatos incluyen variables continuas, transformaciones y variables categóricas representables mediante indicadores. En este caso específico, emplearemos regresión múltiple construyendo una jerarquía de modelos lineales desde relaciones simples a modelos con mayor complejidad.
+La variable respuesta es la magnitud reportada, \var{mag}. El enfoque es \textit{descriptivo-explicativo}: se estiman asociaciones y diferencias promedio dentro del catálogo observado, no se predicen terremotos futuros ni se construye un sistema operacional de alerta. La pregunta es abordable mediante regresión lineal múltiple porque la respuesta es numérica y los predictores combinan variables continuas y categóricas representables mediante indicadores. Se utiliza una secuencia de modelos para evaluar, de manera ordenada, el aporte de cada bloque de variables.
 
 La interpretación de fondo se centra en cómo varía la magnitud reportada según profundidad, posición geográfica y características técnicas del registro sísmico. Una limitación central es que la muestra está truncada a eventos con magnitud al menos 4, por lo que las conclusiones no se extrapolan a sismos menores ni al proceso sísmico completo.
 
@@ -81,7 +88,7 @@ La interpretación de fondo se centra en cómo varía la magnitud reportada seg�
 La fuente del dataset empleado es el \textit{USGS Earthquake Catalog}, catálogo oficial y público del \textit{U.S. Geological Survey} (USGS, Servicio Geológico de Estados Unidos)
 \cite{usgs}, el cual, a través de su extensa red de estaciones, el USGS registra continuamente miles de eventos tectónicos, capturando detalladamente sus coordenadas espaciales, características físicas y los parámetros de la estación que los detecta. 
 
-La unidad de observación es un evento sísmico registrado durante 2024 con magnitud (\var{mag}) mayor o igual a 4. La restricción a sismos con esta magnitud no es una limitación técnica de la API, sino una decisión de metodología en el diseño del estudio. Este punto de corte aísla potenciales eventos con relevancia geofísica y garantiza un mayor nivel de calibración instrumental (datos de mejor calidad), dado que los sismos de menor magnitud a este umbral suelen ser registrados por pocas estaciones, lo que podría introducir ruido en el análisis por su baja fiabilidad. Cabe resaltar que esto puede presentar una limítación en los resultados del estudio en cuanto a validez externa; las conclusiones aplican a eventos moderados o mayores, no al proceso sísmico completo. 
+La unidad de observación es un evento sísmico registrado durante 2024 con \var{mag} mayor o igual a 4. La API permite otras consultas, por lo que este umbral es una decisión metodológica de alcance y no una restricción técnica de la fuente. El corte concentra el estudio en un subconjunto homogéneo y manejable de eventos moderados o mayores, pero trunca la distribución de la respuesta y acumula observaciones cerca de 4. En consecuencia, no se supone que el filtro garantice mediciones sin error y las conclusiones no se extrapolan a sismos menores ni al proceso sísmico completo.
 
 Los detalles sobre los componentes de esta base de datos, incluyendo la tipología y el rol de cada variable analizada, se presentan a continuación en la Tabla~\ref{tab:variables_analisis}.
 
@@ -97,11 +104,14 @@ Los detalles sobre los componentes de esta base de datos, incluyendo la tipolog�
 Variable & Tipo & Rol & Justificación de uso \\
 \midrule
 \var{mag} & Numérica & Respuesta & Magnitud reportada del evento sísmico. \\
-\var{depth} & Numérica & Predictor & Profundidad del evento; variable geofísica básica. \\
-\var{log\_depth\_plus\_1} & Numérica & Transformación & Variable \var{depth} puede ser asimétrica y su relación con \var{mag} no necesariamente es lineal (ver \textbf{3.0.1 Procesamiento y codificación)}. \\
-\var{latitude}, \var{longitude} & Numéricas & Predictores & Capturan localización espacial del epicentro. \\
-\var{nst}, \var{gap}, \var{dmin}, \var{rms} & Numéricas & Técnicas & Resumen cobertura y ajuste del registro sísmico. \\
-\var{magType}, \var{net} & Categóricas & Indicadores & Permiten comparar diferencias promedio por tipo de magnitud y red de reporte. \\
+\var{depth} & Numérica & Predictor & Profundidad en km; el modelo final usa su término lineal y cuadrático. \\
+\var{log\_depth\_plus\_1} & Numérica & Sensibilidad & Alternativa comparada formalmente con \var{depth} y \var{depth}$^2$. \\
+\var{latitude}, \var{longitude} & Numéricas & Predictores & Coordenadas del epicentro; controlan diferencias geográficas amplias. \\
+\var{nst} & Numérica & Técnica & Número de estaciones; se modela como $\log(\var{nst}+1)$. \\
+\var{gap} & Numérica & Técnica & Brecha azimutal; se modela como $\log(\var{gap}+1)$ y su cuadrado. \\
+\var{dmin} & Numérica & Técnica & Distancia mínima; se modela como $\log(\var{dmin}+1)$ y su cuadrado. \\
+\var{rms} & Numérica & Técnica & Raíz del error cuadrático medio de los residuos de tiempo de viaje. \\
+\var{magType}, \var{net} & Categóricas & Indicadores & Método de magnitud y código de la red que reporta el evento. \\
 \var{region\_from\_place} & Categórica derivada & Apoyo descriptivo & Se agrega para resumir el texto \var{place} en una categoría geográfica interpretable. No reemplaza latitud-longitud, pero ayuda a describir regiones frecuentes y posibles diferencias por zona. \\
 \bottomrule
 \end{tabularx}
@@ -109,19 +119,20 @@ Variable & Tipo & Rol & Justificación de uso \\
 
 
 
-Para el estudio de las variables candidatas a los modelos de regresión, la selección de predictores combina tres criterios principales. Primero, interpretabilidad de fondo: profundidad y coordenadas describen rasgos geofísicos básicos del evento. Segundo, calidad y cobertura del registro: \var{nst}, \var{gap}, \var{dmin} y \var{rms} resumen cuántas estaciones participan, cómo rodean al epicentro, qué tan cerca está la estación más próxima y qué tan bien ajusta la solución reportada respectivamente. Tercero, codificación del catálogo: \var{magType} y \var{net} permiten controlar diferencias promedio por escala de magnitud y red reportante. 
+La selección no se basa únicamente en correlaciones bivariadas. Combina tres criterios: relación directa con la pregunta, interpretación dentro del catálogo y disponibilidad suficiente. Profundidad y coordenadas describen el evento y su ubicación; \var{nst}, \var{gap}, \var{dmin} y \var{rms} caracterizan cobertura y ajuste técnico; \var{magType} y \var{net} controlan diferencias promedio de codificación. Las correlaciones y distribuciones se utilizan como diagnóstico complementario para detectar escalas, asimetrías y colinealidad, no como regla automática de selección.
 
 \begin{table}[H]
     \centering
     \caption{Grupos conceptuales de los predictores}
+    \label{tab:grupos_predictores}
     \scriptsize
     \begin{tabularx}{\textwidth}{lX}
     \toprule
     \textbf{Grupo Conceptual} & \textbf{Variables incluidas y justificación} \\
     \midrule
-    \textbf{Características Geofísicas} & \var{depth}, \var{latitude}, \var{longitude}. Describen los determinantes espaciales, físicos y la mecánica pura del evento tectónico. \\
-    \textbf{Condiciones Técnicas} & \var{nst}, \var{gap}, \var{dmin}, \var{rms}. Capturan aspectos como la calidad, geometría y precisión temporal de la red de instrumentos. \\
-    \textbf{Controles Metodológicos} & \var{magType}, \var{net}. Sirven para aislar los sesgos o diferencias sistemáticas atribuibles al algoritmo de medición o a la agencia que reporta. \\
+    \textbf{Geofísicas y espaciales} & \var{depth}, \var{depth}$^2$, \var{latitude}, \var{longitude}. El log de profundidad se conserva como sensibilidad. \\
+    \textbf{Técnicas del registro} & $\log(\var{nst}+1)$, $\log(\var{gap}+1)$, $\log(\var{dmin}+1)$ y \var{rms}. Resumen cobertura, geometría, proximidad y ajuste. \\
+    \textbf{Codificación del catálogo} & \var{magType\_grouped}, \var{net\_grouped}. Permiten estimar diferencias promedio por método de magnitud y red reportante. \\
     \bottomrule
     \end{tabularx}
 \end{table}
@@ -135,22 +146,22 @@ Respecto a las consideraciones éticas del estudio: Los datos no contienen infor
 La base de datos inicial contiene 14.176 registros. Con el fin de adecuar las variables disponibles para el análisis estadístico y asegurar la consistencia de los posteriores modelos, se llevó a cabo un proceso de conversión de variables, estructuración, agrupación y gestión de datos faltantes, el cual se describe a continuación:
 
 
-\subsubsection{Procesamiento y codificación}
+\subsection{Procesamiento y codificación}
 \begin{itemize}
     \item \textbf{Normalización de fechas:} La variable \var{time} se convirtió formalmente al estándar de fecha-hora UTC. Luego, se derivaron el resto de componentes temporales, esto es, \var{month} (mes), \var{hour} (hora del evento) y \var{weekday} (día de la semana).
-    \item \textbf{Conversión de Tipos:} Se forzaron las variables continuas a numéricas con Se forzó la tipificación de las variables numéricas implementando un criterio de manejo de errores (\texttt{errors="coerce"}).
+    \item \textbf{Conversión de tipos:} Las variables continuas se convirtieron a formato numérico con \texttt{errors="coerce"}; los valores no interpretables quedan registrados como faltantes para su revisión.
     
-    \item \textbf{Transformación funcional:} Se contruyóla variable transformada logarítmica \var{log\_depth\_plus\_1} sobre \var{depth} con un propósito es estrictamente funcional: mitigar la asimetría de la variable original y evaluar empíricamente relaciones no lineales en los modelos estadísticos. No se implementó con el objetivo de normalizar el predictor (un estimador MCO no exige normalidad en la matriz de diseño), ni para suavizar valores atípicos, ya que que los sismos ultra-profundos contienen información física valiosa. La validez de esto se revisará en un análisis de sensibilidad comparando los modelos aplicados con \var(depth) original, para evaluar su efecto.
+    \item \textbf{Transformaciones candidatas:} Se creó \var{log\_depth\_plus\_1} mediante \texttt{log1p(depth.clip(lower=0))}, pero no se adoptó automáticamente. La asimetría de un predictor no viola MCO; la decisión final compara profundidad lineal, cuadrática y logarítmica sobre la misma muestra. También se evaluaron escalas originales y $\log(x+1)$ para \var{nst}, \var{gap}, \var{dmin} y \var{rms}. Todas las transformaciones se justifican en la Sección~\ref{sec:transformaciones} mediante ajuste, validación, dominio e interpretación.
     
 
-    \item \textbf{Extracción fextual:} Se procesó el campo descriptivo \var{place} y se extrajo (mediante técnicas de expresiones regulares) una variable categórica derivada \var{region\_from\_place}, simplificando la localización geográfica de un evento sísmico.
+    \item \textbf{Extracción textual:} Desde \var{place} se obtuvo \var{region\_from\_place}, tomando el texto posterior a la última coma; los textos sin coma se codificaron como \textit{Unknown/No comma}.
 
 
-    \item \textbf{Grupos en variables categóricas:}  Para evitar indicadores inestables, se agruparon las variables categoricas. En \var{magType} se mantuvieron intactos sus 8 niveles originales, dado que superaban el umbral de frecuencia establecido para ser representable. Para \var{net}, se conservaron 8 redes principales (us, ak, pr, nc, ci, hv, tx, nn) y el resto se agrupó en \textit{Other}. En \var{region\_from\_place} se conservaron las 45 regiones más frecuentes junto a \textit{Unknown/No comma}, colapsando el resto bajo \textit{Other}.
+    \item \textbf{Agrupación de categorías:} Se exigieron al menos 30 eventos por nivel. En \var{magType} se conservaron \textit{mb, md, ml, mw, mwr} y \textit{mww}; \textit{mwb} y \textit{mh} se agruparon como \textit{Other} (5 eventos). En \var{net} se conservaron \textit{us, ak, pr, nc} y \textit{ci}; las seis redes restantes se agruparon como \textit{Other} (38 eventos). \var{region\_grouped}, usada solo descriptivamente, retuvo las 45 regiones más frecuentes y agrupó 607 eventos como \textit{Other}.
 
 \end{itemize}
 
-\subsubsection{Control de calidad de los datos}
+\subsection{Control de calidad de los datos}
 Se ejecutó una revisión en la consistencia interna de la base de datos para el análisis de identificadores únicos (validación y descarte de registros duplicados a través de la variable) y verificación de los límites físicos esperados para las magnitudes, coordenadas geográficas y profundidades.
     
 
@@ -161,6 +172,7 @@ Se ejecutó una revisión en la consistencia interna de la base de datos para el
 \begin{table}[H]
     \centering
     \caption{Resultados de la revisión y rangos observados de los datos}
+    \label{tab:control_calidad}
     \scriptsize
     \setlength{\tabcolsep}{10pt}
     \begin{tabular}{ll}
@@ -182,18 +194,19 @@ Se ejecutó una revisión en la consistencia interna de la base de datos para el
 
 Luego, la inspección confirma que no hay duplicados por \var{id}. Los faltantes principales se concentran en \var{dmin}, \var{gap}, \var{nst} y \var{rms}, mientras que \var{mag}, \var{depth}, \var{latitude} y \var{longitude} no presentan faltantes en la base procesada.
 
-\subsubsection{Tratamiento de datos faltantes }
+\subsection{Tratamiento de datos faltantes}
 
-Para el tratamiento de datos faltantes no se eliminan automáticamente valores atípicos de magnitud o profundidad; para los modelos preliminares se usa eliminación por lista (\textit{listwise deletion}). Esta técnica consiste en descartar las observaciones que presentan valores faltantes en las variables del modelo, asegurando un ajuste sobre una muestra completa y sin recurrir a predecir el valor faltante que puede alterar la varianza original \cite{geeksforgeeks_listwise}. Esta estrategia en la metodología del estudio se justifica bajo los siguientes criterios:
+No se eliminan automáticamente valores atípicos de magnitud o profundidad. Para la modelación se utiliza análisis de casos completos: una observación se excluye solo si carece de alguna variable requerida por la especificación comparada \cite{littleRubin2019}. La decisión se considera razonable como aproximación inicial porque la pérdida máxima es 52 de 14.176 eventos (0.37\%); sin embargo, puede introducir sesgo si la ausencia no es aproximadamente aleatoria, por lo que se revisarán patrones de faltantes y sensibilidad. Para comparar AIC, BIC y pruebas F, todos los modelos M1--M6 se ajustan sobre la misma muestra de 14.124 casos completos.
+Esta estrategia se apoya en los siguientes criterios:
 \begin{itemize}
     \item \textbf{Baja incidencia:} La pérdida de información es mínima; la variable con mayor proporción de datos faltantes (\var{dmin}) representa apenas el 0.37\% del total de la muestra.
-    \item \textbf{Mapeo completo:} La técnica descarta de forma estricta únicamente aquellas observaciones que carecen de registros en las variables específicas incorporadas a cada modelo (luego, cada registro contiene toda la información posible).
-    \item \textbf{Preservación de la varianza:} Como garantizamos la fiabilidad de la muestra original, se evita el uso de algoritmos de imputación o predicción de valores faltantes que pudiesen alterar o subestimar de forma artificial la varianza y la estructura de covarianzas de la base de datos.
+    \item \textbf{Comparabilidad:} Los modelos candidatos se estiman sobre idénticas observaciones, evitando atribuir a un bloque de regresores cambios producidos solo por variaciones de muestra.
+    \item \textbf{Transparencia:} No se imputan valores sin un modelo explícito de ausencia; la limitación del análisis de casos completos queda declarada.
 \end{itemize}
 
 
 
-Finalmente, después de la limpieza inicial se mantienen 14.176 eventos para el modelo inicial (la eliminación específicada anteriormente solo se efectuará cuando algún modelo ocupe alguna variable que presente datos faltantes, donde lógicamente, se reducirá el tamaño muestral asociado a este, veáse \textbf{5. Plan de modelos}). 
+Después de la limpieza inicial se mantienen 14.176 eventos en la base procesada. La muestra común usada para comparar los modelos contiene 14.124 eventos.
 
 %{\reporttablesize
 %\input{tables/ficha_datos.tex} MISMA TABLA QUE ABAJO
@@ -202,6 +215,7 @@ Finalmente, después de la limpieza inicial se mantienen 14.176 eventos para el 
 \begin{table}[H]
     \centering
     \caption{Resumen del conjunto de datos y consideraciones metodológicas}
+    \label{tab:ficha_datos}
     \scriptsize
     \begin{tabularx}{\textwidth}{lX}
     \toprule
@@ -222,7 +236,7 @@ Finalmente, después de la limpieza inicial se mantienen 14.176 eventos para el 
 
 \section{Análisis exploratorio de datos (EDA) }
 
-Una vez consolidado el proceso de limpieza y estructuración de la base de datos, se procedió a realizar un Análisis exploratorio de datos (EDA). Este análisis tiene como propósito caracterizar el comportamiento de las variables, evaluar sus distribuciones e identificar patrones preliminares de asociación lineal y espacial. En la Tabla 5 se exhibe el resumen estadístico global para el conjunto de las variables numéricas.
+Una vez consolidada la base, el análisis exploratorio caracteriza distribuciones e identifica patrones preliminares de asociación lineal, categórica y espacial. La Tabla~\ref{tab:estadisticas_descriptivas} resume tendencia central, dispersión y rangos de las variables numéricas utilizadas.
 
 
 
@@ -231,31 +245,19 @@ Una vez consolidado el proceso de limpieza y estructuración de la base de datos
     \caption{Estadísticas descriptivas de las variables numéricas analizadas}
     \label{tab:estadisticas_descriptivas}
     \scriptsize
-    \setlength{\tabcolsep}{14pt} % Espaciado equilibrado para columnas numéricas
-    \begin{tabular}{lrrrrr}
-    \toprule
-    \textbf{Variable} & \textbf{Media} & \textbf{Mediana} & \textbf{Desv. Est.} & \textbf{Mínimo} & \textbf{Máximo} \\
-    \midrule
-    \textbf{Magnitud (mag)} & 4.491 & 4.400 & 0.376 & 4.000 & 7.500 \\
-    \textbf{Profundidad (depth)} & 92.463 & 34.622 & 142.314 & -0.070 & 671.043 \\
-    \textbf{Log(depth + 1)} & 3.643 & 3.573 & 1.305 & 0.000 & 6.510 \\
-    \textbf{N° Estaciones (nst)} & 49.793 & 35.000 & 42.680 & 7.000 & 619.000 \\
-    \textbf{Brecha Azimutal (gap)} & 106.742 & 102.000 & 45.778 & 10.000 & 343.000 \\
-    \textbf{Distancia Mín. (dmin)} & 3.654 & 2.284 & 4.844 & 0.000 & 62.558 \\
-    \textbf{Error RMS (rms)} & 0.707 & 0.690 & 0.221 & 0.000 & 1.740 \\
-    \bottomrule
-    \end{tabular}
+    \setlength{\tabcolsep}{6pt}
+    \resizebox{\textwidth}{!}{\input{tables/descriptive_summary.tex}}
 \end{table}
 
 A partir del resumen estadístico de las variables, se destacan los siguientes comportamientos en la muestra inicial ($n = 14.176$):
 
 \begin{itemize}
-    \item \textbf{Magnitud de los eventos (mag)}: El dataset abarca sismos con magnitud que van desde nuestro punto de corte (4.0) hasta un máximo de 7.5. La media se situa en 4.491. Un punto importante a destacar es que el 75\% de los datos contemplan magnitudes menores o iguales a 4.6, lo que es lógico ya que suelen haber más sismos de mediana magnitud que grandes terremotos. 
+    \item \textbf{Magnitud (\var{mag}):} Varía entre 4.0 y 7.5, con media 4.491 y mediana 4.400. El 75\% de los eventos no supera 4.6; esta concentración está condicionada por el filtro de inclusión y debe considerarse al interpretar los modelos.
 
     
-    \item \textbf{Profundidad sismo (depth)}: Se observa una dispersión drástica en la profundidad de los sismos (desviación estándar de 142.3 km). Los registros varían desde eventos extremadamente superficiales (cercanos al 0) hasta sismos ultra-profundos que alcanzan los 671 km. Una evidencia adicional a esta dispersión entre los datos podemos encontrarla al comparar la media (92.46 km) y la mediana (34.62 km), lo que sugiera una cola en la distribución (derecha), aunque también podría ser producto de la construcción del dataset (ya que solo toma sismos con magnitud mayor o igual 4).
+    \item \textbf{Profundidad (\var{depth}):} Presenta media 92.463 km, mediana 34.622 km y desviación estándar 142.314 km. La diferencia entre media y mediana evidencia asimetría a la derecha, con eventos profundos informativos que se conservan en el análisis.
 
-    \item \textbf{Variables Instrumentales de Control}: El número de estaciones receptoras (nst) presenta un promedio de casi 50 estaciones por evento, pero con un máximo extremo de 619, lo que sugiere una heterogeneidad en la detección global de los sismos en el dataset. Por otro lado, la brecha azimutal (gap) promedia 106.7°, lo que sugiere una cobertura razonable para la mayoría de eventos, teniendo en cuenta que el máximo valor se registra en 343°.
+    \item \textbf{Variables técnicas:} \var{nst} tiene media 49.793 y máximo 619, mientras \var{gap} promedia 106.742 grados y alcanza 343. Estas escalas heterogéneas motivan revisar influencia, forma funcional y varianza residual, sin convertirlas en explicaciones causales.
 
 \end{itemize}
 
@@ -299,17 +301,29 @@ Para complementar el análisis brindado por los estadísticos de tendencia centr
 
 
 
-El gráfico espacial resultante del análisis de magnitud por regíón en la Figura 1.c revela que los eventos no se distribuyen de forma aleatoria, sino que calzan estrictamente en los límites de las placas tectónicas, dando el aspecto natural del cinturón de fuego del pacífico \cite{cnn_cinturon_fuego_2024}. Respecto a nuestro estudio, esto valida la necesidad de controlar por las variables espaciales latitud-longitud en el modelado posterior. 
+El mapa de la Figura 1.c muestra una distribución espacial concentrada en franjas y regiones sísmicamente activas, coherente de manera general con zonas del Cinturón de Fuego del Pacífico \cite{cnn_cinturon_fuego_2024}. El gráfico no prueba dependencia ni causalidad espacial, pero justifica incorporar latitud y longitud como controles y revisar si los residuos conservan estructura geográfica.
 
-Por otra parte, el análisis categórico por tipo de medición (Figura 1.d) expone variaciones estructurales significativas: mientras que categorías como \var{md} o \var{ml} se asocian en sismos de baja magnitud cercanos al umbral mínimo, los grupos de magnitud (\var{msw} y \var{mwb}) quedan usados casi exclusivamente para grandes eventos sísmicos. Este comportamiento confirma la presencia de sesgos metodológicos intrínsecos en la medición instrumental, justificando la inclusión de variables indicadoras de control.
+El boxplot por tipo de magnitud (Figura 1.d) exhibe diferencias en nivel y dispersión entre métodos. Estas diferencias pueden reflejar ámbitos de aplicación y reglas de codificación distintas; por ello se incluyen indicadores de \var{magType\_grouped}. Se trata de diferencias descriptivas dentro del catálogo, no de evidencia de sesgo causal ni de superioridad de un método.
 
 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.88\textwidth]{fig_covariate_distributions.png}
-\vspace{0.12cm}
-\caption{Distribuciones de predictores usados en los modelos principales. Cada panel indica el nombre de la variable y su significado entre paréntesis. Las variables numéricas se muestran con histogramas y las categóricas agrupadas con barras; en variables muy asimétricas se usa el rango p1--p99 solo para visualización, sin eliminar observaciones de la base analítica.}
+\includegraphics[width=0.98\textwidth]{fig_covariates_numeric_a.png}
+\caption{Distribuciones de covariables principales: profundidad transformada, coordenadas y número de estaciones. Cada panel explicita el significado y la unidad o escala utilizada.}
+\label{fig:covariables}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat
+\centering
+\includegraphics[width=0.98\textwidth]{fig_covariates_numeric_b.png}
+\caption[]{Distribuciones de covariables principales (continuación): brecha azimutal, distancia mínima transformada y error RMS. El recorte p1--p99 se usa solo para visualizar \var{gap} y \var{rms}; ninguna observación se elimina por este gráfico.}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat
+\centering
+\includegraphics[width=0.98\textwidth]{fig_covariates_categorical.png}
+\caption[]{Distribuciones de covariables principales (continuación): método usado para reportar la magnitud y red que aportó la solución. La escala logarítmica del conteo permite visualizar niveles frecuentes y poco frecuentes sin alterar los datos.}
 \end{figure}
 
 
@@ -320,80 +334,227 @@ Las distribuciones de predictores complementan esta lectura (Figura 2): \var{log
 
 
 \newpage
-%%%%%%%%%%%%%%%%% 4. PLAN DE MODELOS %%%%%%%%%%%%%%%%%
-\section{Plan de modelos}
+%%%%%%%%%%%%%%%%% 4. MODELACIÓN E INFERENCIA %%%%%%%%%%%%%%%%%
+\section{Modelación e inferencia}
 
-Para la modelació de la regresión múltiple se considera una secuencia de modelos lineales anidados interpretables. M1 evalúa la asociación marginal con profundidad transformada; M2 agrega ubicación básica mediante latitud y longitud; M3 incorpora variables técnicas del registro; M4 agrega diferencias promedio por tipo de magnitud; M5 revisa si la red de reporte captura diferencias adicionales; y M6 permite una relación espacial flexible con términos cuadráticos e interacción latitud-longitud, sin salir del marco de regresión lineal. Estas comparaciones evalúan qué bloque de variables aporta evidencia preliminar, controlando por las demás variables incluidas.
+\subsection{Modelo general y supuestos}
 
+Se trabaja con $\mathbf Y=\mathbf X\boldsymbol\beta+\boldsymbol\varepsilon$. El modelo es lineal en $\boldsymbol\beta$ aunque incluya cuadrados e interacciones. MCO proyecta $\mathbf Y$ ortogonalmente sobre $C(\mathbf X)$ mediante $\mathbf H=\mathbf X(\mathbf X^{\top}\mathbf X)^{-1}\mathbf X^{\top}$; el modelo con solo intercepto corresponde a $\mathbf H_0=\mathbf J_n/n$ y permite la descomposición $SCT=SCR+SCE$ \cite{montgomery2021}. El modelo nulo se usa como referencia geométrica, no como candidato sustantivo.
 
-\begin{table}[H]
-    \centering
-    \caption{Bloques de modelos lineales candidatos}
-    \scriptsize
-    \begin{tabularx}{\textwidth}{llX}
-    \toprule
-    \textbf{Modelo} & \textbf{Bloque agregado} & \textbf{Propósito estadístico} \\
-    \midrule
-    \textbf{M1} & \var{log\_depth\_plus\_1} & Evaluar asociación marginal entre magnitud y profundidad. \\
-    \textbf{M2} & \textbf{M1} + \var{latitude} + \var{longitude} & Controlar por latitud y longitud del evento. \\
-    \textbf{M3} & \textbf{M2} + \var{nst} + \var{gap} + \var{dmin} + \var{rms} & Incorporar cobertura y ajuste del registro sísmico. \\
-    \textbf{M4} & \textbf{M3} + \var{magType} & Comparar diferencias promedio según método de magnitud. \\
-    \textbf{M5} & \textbf{M4} + \var{net} & Evaluar diferencias adicionales asociadas a la institución reportante. \\
-    \textbf{M6} & \textbf{M5} + \var{lat}$^2$ + \var{lon}$^2$ + (\var{lat} $\times$ \var{lon}) & Permitir curvatura espacial mediante latitud, longitud, cuadrados e interacción. \\
-    \bottomrule
-    \end{tabularx}
-\end{table}
+Los supuestos evaluados son: A1, especificación de la media y linealidad en parámetros; A2, rango completo de $\mathbf X$; A3, $E(\varepsilon\mid X)=0$; A4, varianza constante y ausencia de correlación; y A5, normalidad para inferencia exacta. Los diagnósticos no prueban que el modelo sea verdadero: permiten detectar incompatibilidades y escoger remedios.
 
-%{\reporttablesize
-%\input{tables/model_comparison.tex} MISMA TABLA QUE ABAJO
-%}
+\subsection{Decisiones de transformación}
+\label{sec:transformaciones}
 
+\subsubsection{Profundidad}
+
+La asimetría de \var{depth} no obliga a transformarla, pues MCO no requiere predictores normales. Se comparan especificaciones con igual respuesta y muestra. Dentro de cada escala, agregar el cuadrado es una comparación anidada; entre \var{depth} y $\log(\var{depth}+1)$ los modelos no son anidados, por lo que no corresponde una prueba F entre escalas.
 
 \begin{table}[H]
-    \centering
-    \caption{Comparación de rendimiento y criterios de información de los modelos estimados}
-    \scriptsize
-    \setlength{\tabcolsep}{12pt} 
-    \begin{tabular}{lccccccc}
-    \toprule
-    \textbf{Modelo} & \textbf{n} & \textbf{Parámetros} & \textbf{R² ajust.} & \textbf{AIC} & \textbf{BIC} & \textbf{RMSE} & \textbf{MAE} \\
-    \midrule
-    \textbf{M1} & 14176 & 2  & 0.028 & 12096.022 & 12111.141 & 0.371 & 0.268 \\
-    \textbf{M2} & 14176 & 4  & 0.048 & 11801.695 & 11831.933 & 0.367 & 0.264 \\
-    \textbf{M3} & 14124 & 8  & 0.535 & 1633.633  & 1694.079  & 0.256 & 0.184 \\
-    \textbf{M4} & 14124 & 15 & 0.624 & -1361.202 & -1247.868 & 0.230 & 0.170 \\
-    \textbf{M5} & 14124 & 22 & 0.625 & -1390.252 & -1224.028 & 0.230 & 0.170 \\
-    \textbf{M6} & 14124 & 18 & 0.633 & -1688.352 & -1552.351 & 0.228 & 0.168 \\
-    \bottomrule
-    \end{tabular}
+\centering
+\caption{Comparación de escalas y formas funcionales para profundidad}
+\label{tab:depth_final}
+\scriptsize
+\resizebox{\textwidth}{!}{\input{tables/depth_final_comparison.tex}}
 \end{table}
 
+El cuadrado de profundidad aporta sobre la forma lineal ($F=225.95$, $p<0.001$). La especificación \var{depth}+\var{depth}$^2$ alcanza AIC $-3248.86$ y CV-RMSE 0.2161, mejores que el log lineal y ligeramente mejores que el log cuadrático. Por ello se usa profundidad original estandarizada con término cuadrático. La pendiente local cambia con profundidad y con longitud; no se interpreta como efecto causal.
 
-Respecto al análisis del rendimiento de los modelos en la Tabla 7 se puede evidenciar una una evolución crucial en la capacidad predictiva. Los modelos puramente geofísicos iniciales (\textbf{M1} y \textbf{M2}) muestran un ajuste sumamente pobre, con un $R^2$ ajustado inferior al 5\%. Sin embargo, al anidar el modelo\textbf{M3} (esto es, la incorporación de las condiciones técnicas del registro instrumental) se reduce el AIC de manera drástica (de $11801.695$ a $1633.633$) y el $R^2$ ajustado aumenta hasta $0.535$, presentando una clara evidencia que no bastan las características físicas del evento para un buen rendimiento; la calidad y la geometría que la red de captura (variables instrumentales) son determinantes en la variabilidad de la magnitud reportada. Además, cabe destacar que la reducción en el tamaño muestral ($n = 14.124$) a partir de este bloque se explica por la eliminación por lista de los registros faltantes en dichas variables agregadas.
+Solo un evento tiene profundidad negativa ($-0.07$ km). Como es mayor que $-1$, $\log(\var{depth}+1)$ sin recorte está definido. Las versiones con y sin recorte entregan AIC y CV-RMSE prácticamente iguales, de modo que esa observación no determina la decisión. Los eventos profundos se conservan.
 
+\subsubsection{Variables técnicas}
 
-Luego, el rendimiento se comienza a consolidar en los bloques superiores. Al introducir los controles metodológicos del tipo de magnitud (\textbf{M4}), los criterios de información logran valores negativos, indicando un ajuste superior. Al analizar la incorporación de las redes de reporte en el \textbf{M5}, podemos apreciar un leve sobreajuste, ya que a pesar de aumentar a 22 parámetros, el (\textit{BIC}) empeora de $-1247.868$ a $-1224.028$, lo que nos sugiere que la incorporación de las distrintas agencias que evaluan el sismo no añade un valor predictivo real. Finalmente, el modelo que permite modelar la curvatura espacial \textbf{M6} resulta el más eficiente del catálogo, alcanzando el menor AIC ($-1688.352$) y el menor BIC ($-1552.351$) y con una reducción de 4 parámetros respecto al anterior.
+Para \var{nst}, \var{gap}, \var{dmin} y \var{rms} se contrastaron escala original y $\log(x+1)$. El dominio se cumple porque son no negativas; $\log1p$ también admite ceros. La motivación es representar cambios marginales decrecientes, no normalizar los predictores.
 
+\begin{table}[H]
+\centering
+\caption{Sensibilidad a transformaciones de predictores técnicos}
+\label{tab:transformaciones_x}
+\scriptsize
+\resizebox{\textwidth}{!}{\input{tables/predictor_transform_comparison.tex}}
+\end{table}
 
-En conclusión, la comparación preliminar sugiere mejoras importantes al pasar de modelos puramente geográficos a modelos con variables técnicas y tipo de magnitud. Sin embargo, el modelo final no se escogerá solo por R2 o AIC/BIC: se priorizará interpretabilidad, diagnóstico de supuestos, colinealidad, observaciones influyentes y estabilidad ante categorías agrupadas. Dentro de esta etapa, \textbf{M4} (como modelo lineal parsimonioso e interpretable) y el \textbf{M6} (como modelo más robusto) se establecen como los candidatos naturales para la fases siguientes de diagnósticos.
+$\log(\var{nst}+1)$ produce una mejora amplia; $\log(\var{dmin}+1)$ una mejora moderada; y $\log(\var{gap}+1)$ una mejora pequeña pero consistente en AIC, BIC y validación. Esta última expresa que un aumento relativo de la brecha puede importar más cuando la cobertura inicial es buena que cuando ya es deficiente. $\log(\var{rms}+1)$ cambia el ajuste de forma despreciable, por lo que \var{rms} se mantiene en segundos. Estandarizar después de transformar no cambia el ajuste: centra el intercepto, iguala unidades y reduce colinealidad no esencial.
 
-%%%%%%%%%%%%%%%%% 5. DIAGNÓSTICOS %%%%%%%%%%%%%%%%%
-\section{Diagnósticos previstos y siguientes pasos}
+\subsubsection{Respuesta y Box--Cox}
 
-En el informe final se revisarán residuos contra ajustados, normalidad aproximada mediante QQ-plot e histograma, heterocedasticidad potencial, distancia de Cook, leverage con residuos estudentizados y VIF para predictores numéricos principales. También se utilizaran pruebas de hipótesis formales para garantizar el rigor estadístico, incluyendo, el test de Breusch-Pagan para evaluar el supuesto de homocedasticidad, y las pruebas de Jarque-Bera o Shapiro-Wilk para contrastar la normalidad de los residuos. Adicionalmente, la significancia global e individual de los parámetros estimados se evalúa mediante el Test F (ANOVA) y pruebas t, respectivamente.
+Box--Cox exige $Y>0$, condición satisfecha porque \var{mag}$\ge4$. El perfil se calculó dentro del modelo completo e incluyó el jacobiano $(\lambda-1)\sum_i\log y_i$ \cite{boxcox1964}; por ello sí permite comparar $\lambda$, a diferencia de comparar $R^2$ de respuestas distintas. El máximo es $\widehat\lambda=-2.475$ con IC 95\% $[-2.625,-2.350]$.
 
-Si quedan patrones espaciales en residuos, estos se evaluarán con cautela. Dado que los datos son eventos puntuales, un modelo CAR no es el enfoque directo salvo que se agreguen observaciones por áreas o grillas; el foco del curso seguirá siendo regresión lineal múltiple, selección razonada de variables, inferencia y análisis de residuos.
+\begin{table}[H]
+\centering
+\caption{Diagnósticos residuales bajo transformaciones de la respuesta}
+\label{tab:transformaciones_y}
+\footnotesize
+\input{tables/response_transform_sensitivity.tex}
+\end{table}
 
-Como análisis de sensibilidad se contrastarán decisiones razonables de transformación y especificación, por ejemplo usar \var{depth} versus \var{log\_depth\_plus\_1}, incluir o no variables técnicas con faltantes, y revisar la estabilidad de conclusiones ante observaciones influyentes. Esto permitirá distinguir patrones descriptivos robustos de resultados dependientes de una codificación particular.
+No se adopta Box--Cox. La muestra está truncada en 4 y la acumulación en el umbral influye en el perfil; \var{mag} ya representa una escala logarítmica sismológica; la retransfomación exigiría corrección de sesgo; y heterocedasticidad y no normalidad continúan bajo todas las alternativas. El log de \var{mag} reduce evidencia RESET, pero sería el logaritmo de una escala ya logarítmica y no resuelve BP ni JB. Los $R^2$ transformados no se comparan con el de la respuesta original.
 
-%%%%%%%%%%%%%%%%% 6. REPRODUCIBILIDAD %%%%%%%%%%%%%%%%%
+\subsection{Secuencia y modelo final}
+
+M4 es la línea base. G1 transforma y estandariza predictores; G2 agrega curvatura; G3 incorpora todas las interacciones candidatas; y G final elimina $\log(\var{nst}+1)^2$, \var{rms}$^2$, $\log(\var{gap}+1)\times\log(\var{dmin}+1)$ y \var{depth}$\times$\var{latitude}. Se conserva jerarquía: cada variable de un cuadrado o interacción aparece como efecto principal.
+
+\begin{table}[H]
+\centering
+\caption{Comparación de especificaciones sobre los mismos 14.124 eventos}
+\label{tab:comparacion_final}
+\scriptsize
+\resizebox{\textwidth}{!}{\input{tables/final_model_comparison.tex}}
+\end{table}
+
+G final contiene 23 parámetros, $R^2$ ajustado 0.6715, RMSE 0.2153 y los menores AIC/BIC de la secuencia. La reducción desde G3 no es rechazada ni por F clásica ($p=0.480$) ni por el contraste HC3 ($p=0.612$), mientras curvatura e interacciones sí aportan ($p<0.001$).
+
+\begin{table}[H]
+\centering
+\caption{Pruebas de bloques anidados: referencia clásica y contraste HC3}
+\label{tab:seleccion_final}
+\scriptsize
+\resizebox{\textwidth}{!}{\input{tables/final_selection_tests.tex}}
+\end{table}
+
+Con variables estandarizadas $z$ y \textit{mb} como referencia, la especificación exacta es
+\begin{align*}
+\var{mag}_i={}&\beta_0+\beta_1z_{d,i}+\beta_2z_{lat,i}+\beta_3z_{lon,i}
++\beta_4z_{nst,i}+\beta_5z_{gap,i}+\beta_6z_{dmin,i}+\beta_7z_{rms,i}\\
+&+\sum_{k\neq \mathrm{mb}}\gamma_kD_{ik}
++\beta_8z_{d,i}^{2}+\beta_9z_{lat,i}^{2}+\beta_{10}z_{lon,i}^{2}
++\beta_{11}z_{gap,i}^{2}+\beta_{12}z_{dmin,i}^{2}\\
+&+\beta_{13}z_{lat,i}z_{lon,i}+\beta_{14}z_{nst,i}z_{gap,i}
++\beta_{15}z_{nst,i}z_{dmin,i}+\beta_{16}z_{d,i}z_{lon,i}+\varepsilon_i .
+\end{align*}
+Aquí $z_{nst}$, $z_{gap}$ y $z_{dmin}$ estandarizan las respectivas transformaciones $\log(x+1)$, mientras $z_d$ estandariza \var{depth} original. Para \var{magType} se usan seis indicadores $D_{ik}$ y se omite \textit{mb}; esta codificación $k-1$ evita la trampa de variables dummy y hace del intercepto la media ajustada del grupo de referencia. La jerarquía se preserva: todo predictor involucrado en un cuadrado o interacción aparece también como efecto principal.
+
+\subsection{ANOVA, contrastes e interpretación}
+
+La ANOVA clásica contrasta que las 22 pendientes sean cero y descompone la variabilidad, pero su inferencia exacta requiere homocedasticidad y normalidad. Como ambos supuestos se rechazan, los contrastes HC3 constituyen la inferencia principal \cite{white1980}.
+
+\begin{table}[H]
+\centering
+\caption{ANOVA clásica del modelo final}
+\label{tab:anova_final}
+\footnotesize
+\input{tables/final_anova.tex}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Contrastes F robustos HC3 por bloque del modelo final}
+\label{tab:bloques_final}
+\footnotesize
+\input{tables/final_block_tests.tex}
+\end{table}
+
+Profundidad, curvatura espacial, curvatura técnica, interacciones técnicas y tipo de magnitud aportan conjuntamente ($p<0.001$). Los coeficientes implicados en cuadrados o interacciones son pendientes locales cuando las otras variables estandarizadas valen cero; no deben leerse como efectos constantes.
+
+\begin{table}[H]
+\centering
+\caption{Coeficientes continuos e inferencia de sensibilidad}
+\label{tab:coeficientes_final}
+\scriptsize
+\resizebox{\textwidth}{!}{\input{tables/final_coefficients_compact.tex}}
+\end{table}
+
+El intercepto 4.376 corresponde a un evento \textit{mb} con profundidad 92.64 km, latitud 3.24, longitud 33.96, \var{nst} 38.47, \var{gap} 96.51, \var{dmin} 2.52 y \var{rms} 0.707. Todos esos valores están dentro de sus rangos observados y \textit{mb} es la categoría mayoritaria. El vector exacto no necesita ser un evento real: es un perfil de referencia; el evento \var{us6000m416} está a 0.69 unidades de distancia estandarizada y muestra que la referencia no está aislada del soporte.
+
+Para las seis diferencias de \var{magType} frente a \textit{mb} se usan intervalos simultáneos Bonferroni, adecuados al conjunto finito preespecificado y menos conservadores que Scheffé. Solo \textit{mww} ($+0.431$) y \textit{mwr} ($-0.189$) excluyen cero simultáneamente; los demás, sobre todo \textit{Other} (cinco casos), tienen mayor incertidumbre.
+
+%%%%%%%%%%%%%%%%% 5. DIAGNÓSTICO Y REMEDIOS %%%%%%%%%%%%%%%%%
+\section{Diagnóstico y remedios}
+
+\begin{table}[H]
+\centering
+\caption{Estado de los supuestos y respuesta metodológica}
+\label{tab:supuestos}
+\scriptsize
+\input{tables/assumption_summary.tex}
+\end{table}
+
+\subsection{Geometría y colinealidad}
+
+$\mathbf X$ tiene rango completo ($23/23$), $\sum h_{ii}=23$, $X^{\top}e\approx0$ y la proyección es numéricamente idempotente. El número de condición bruto es 179.49 por escalas y frecuencias de indicadores; al normalizar columnas disminuye a 7.73. El VIF máximo es 6.65 para profundidad$^2$ y 6.00 para profundidad. Es colinealidad moderada y esperable en un polinomio, no no-identificabilidad; por ello profundidad se interpreta como bloque y no se elimina un término jerárquico solo para reducir VIF.
+
+\subsection{Forma funcional, heterocedasticidad y normalidad}
+
+\begin{table}[H]
+\centering
+\caption{Pruebas formales de diagnóstico del modelo final}
+\label{tab:diagnosticos_final}
+\scriptsize
+\resizebox{\textwidth}{!}{\input{tables/final_diagnostic_tests.tex}}
+\end{table}
+
+Breusch--Pagan rechaza varianza constante bajo una forma lineal para la varianza; White también rechaza bajo una alternativa más general \cite{white1980}. MCO puede seguir estimando la media bajo A3, pero los errores estándar clásicos quedan mal calibrados. Se usa HC3 como principal y errores agrupados por \var{region\_grouped} como sensibilidad a dependencia intrarregional. Los efectos principales permanecen, mientras términos pequeños pierden precisión agrupada; esa inestabilidad se declara.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\textwidth]{fig_final_resid_fitted.png}
+    \caption{Residuos frente a ajustados.}
+\end{subfigure}\hfill
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\textwidth]{fig_final_scale_location.png}
+    \caption{Escala--localización.}
+\end{subfigure}
+\caption{Diagnóstico de media y varianza del modelo final.}
+\end{figure}
+
+RESET aún rechaza, de modo que el modelo es una aproximación útil y no la forma verdadera del proceso. Jarque--Bera y Shapiro--Wilk rechazan normalidad; con $n=14.124$ detectan desviaciones pequeñas, pero el QQ-plot confirma colas pesadas. La normalidad no es necesaria para calcular MCO, aunque sí para inferencia t/F exacta en muestras finitas.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\textwidth]{fig_final_qq.png}
+    \caption{QQ-plot de residuos.}
+\end{subfigure}\hfill
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\textwidth]{fig_final_acf.png}
+    \caption{ACF en orden temporal.}
+\end{subfigure}
+\caption{Normalidad y dependencia secuencial de los residuos.}
+\end{figure}
+
+Durbin--Watson es 1.731, la ACF muestra correlación positiva inicial y Ljung--Box a diez rezagos rechaza ausencia conjunta de autocorrelación ($p<0.001$) \cite{ljungbox1978}. Son tamizajes, no evidencia concluyente de un proceso AR(1), porque los eventos no están igualmente espaciados y el orden temporal mezcla regiones. Un CAR tampoco es directo para puntos sin agregación territorial. La sensibilidad por región y la validación espacial cuantifican parte de esta fragilidad.
+
+\subsection{Influencia y robustez}
+
+Se revisan residuos estudentizados internos y externos, leverage, Cook, DFFITS, DFBETAS y COVRATIO. Las reglas $h_{ii}>2p/n$, $D_i>4/n$ y $|t_i|>3$ señalan 907, 739 y 147 eventos. Son reglas de inspección, no criterios de eliminación: sismos grandes y profundos son observaciones reales e informativas. \var{hv74260121} combina leverage 0.202 y Cook 0.203; \var{nc75095651}, magnitud 7.0, tiene residuo externo 12.52. Ambos se conservan.
+
+La M-estimación de Huber \cite{huber1964} produce cambios absolutos inferiores a 0.004 en los efectos principales estandarizados, por lo que su signo y orden de magnitud no dependen de pocos residuos grandes. MCO+HC3 sigue siendo principal porque la pregunta se refiere a la media condicional y requiere inferencia transparente.
+
+WLS con varianza estimada deja RMSE 0.2156 y Breusch--Pagan aún rechaza; no se adopta. Ridge/Lasso tampoco son remedios necesarios: no hay deficiencia de rango y penalizar sesgaría coeficientes centrales. IV/2SLS no se usa porque no existe un instrumento cuya relevancia y exogeneidad sean defendibles. A3 permanece como limitación por omisión, simultaneidad y error de medición.
+
+%%%%%%%%%%%%%%%%% 6. VALIDACIÓN %%%%%%%%%%%%%%%%%
+\section{Selección, validación e incertidumbre}
+
+La selección combina bloques sustantivos, F parcial, Wald HC3, AIC/BIC, jerarquía y parsimonia. Se evalúa con CV aleatoria, CV agrupada por región y corte temporal 80/20. En cada partición las transformaciones y estandarizaciones se estiman solo en entrenamiento, evitando filtración.
+
+\begin{table}[H]
+\centering
+\caption{Validación fuera de muestra de M4 y del modelo final}
+\label{tab:validacion_final}
+\scriptsize
+\resizebox{\textwidth}{!}{\input{tables/final_validation_summary.tex}}
+\end{table}
+
+G final mejora a M4 en los tres esquemas: CV aleatoria RMSE 0.216 y $R^2=0.669$; CV regional RMSE 0.225 y $R^2=0.633$; corte temporal RMSE 0.226 y $R^2=0.639$. La caída al separar regiones o tiempo evidencia heterogeneidad no capturada.
+
+La selección e inferencia usan la misma muestra, de modo que algunos p-valores posteriores a explorar especificaciones pueden ser optimistas. Se mitiga con bloques predefinidos, contrastes robustos, Bonferroni y validación, pero no se elimina sin una muestra externa. Un intervalo de predicción individual sería más ancho que uno para la media y, bajo heterocedasticidad, no debe construirse suponiendo varianza constante. Además, las variables técnicas se conocen después del registro: el análisis no anticipa dónde ni cuándo ocurrirá un sismo.
+
+%%%%%%%%%%%%%%%%% 7. INTERPRETACIÓN %%%%%%%%%%%%%%%%%
+\section{Interpretación, limitaciones y acción propuesta}
+
+Dentro del catálogo USGS 2024 truncado en magnitud 4, la magnitud reportada se asocia con profundidad, ubicación, cobertura técnica y tipo de magnitud. La evidencia favorece profundidad cuadrática en escala original; logaritmos para \var{nst}, \var{gap} y \var{dmin}; curvatura espacial y técnica; e interacciones seleccionadas. Estas decisiones mejoran ajuste y validación respecto de M4, pero no eliminan heterocedasticidad, colas pesadas ni dependencia residual.
+
+Las relaciones no identifican causas físicas. La recomendación es usar el modelo para comparaciones ajustadas y revisiones descriptivas del catálogo por región y método de magnitud. No debe utilizarse para alertas, predicción operacional ni decisiones de seguridad pública. Una extensión futura necesitaría datos y supuestos explícitos para dependencia espacial--temporal y error de medición.
+
+%%%%%%%%%%%%%%%%% 8. REPRODUCIBILIDAD %%%%%%%%%%%%%%%%%
 \section{Reproducibilidad}
 
-El notebook \path{avance_proyecto_regresion.ipynb} genera la base procesada del proyecto (\path{usgs_earthquakes_2024_mag4_model_ready.csv}), las tablas en \path{Plantilla_informe/tables/} y las figuras en \path{Plantilla_informe/figures/}. El repositorio del proyecto está disponible en \url{https://github.com/Paul0112/proyecto_regresion}. Se documentan versiones de paquetes en \path{requirements.txt} y \path{session_info.txt}.
+El notebook \path{avance_proyecto_corregido.ipynb} genera la base procesada \path{usgs_earthquakes_2024_mag4_model_ready.csv}, las tablas en \path{Plantilla_informe/tables/} y las figuras en \path{Plantilla_informe/figures/}, siempre mediante rutas relativas a \path{Final/}. El repositorio está disponible en \url{https://github.com/Paul0112/proyecto_regresion}; las versiones se documentan en \path{requirements.txt} y \path{session_info.txt}.
 
 
 \section*{Declaración de uso de herramientas de IA}
-Se utilizaron herramientas de inteligencia artificial para mejorar la fluidez de redacción y apoyar la estructuración del código LaTeX y Python.
+Se utilizaron herramientas de inteligencia artificial para apoyar la mejora de gráficos en Python, la fluidez de redacción y el orden y disposición de tablas e imágenes en LaTeX. Las decisiones metodológicas, la ejecución y la interpretación de resultados fueron revisadas por los autores.
 
 %%%%%%%%%%%%%%%%% REFERENCIAS %%%%%%%%%%%%%%%%%
 
@@ -423,11 +584,25 @@ Minson, S. E., Meier, M.-A., Baltay, A. S., Hanks, T. C., \& Cochran, E. S.,
 Scientific Reports, Vol. 9, Article 2478 (2019),\\
 \url{https://doi.org/10.1038/s41598-019-39384-y}
 
-\bibitem{geeksforgeeks_listwise}
-GeeksforGeeks,
-\textit{Listwise Deletion in Missing Data},\\
-GeeksforGeeks Data Science, (consultado el 10 de junio de 2026),\\
-\url{https://www.geeksforgeeks.org/data-science/listwise-deletion-in-missing-data/}
+\bibitem{montgomery2021}
+Montgomery, D. C., Peck, E. A., \& Vining, G. G. (2021).
+\textit{Introduction to Linear Regression Analysis} (6th ed.). Wiley.
+
+\bibitem{boxcox1964}
+Box, G. E. P., \& Cox, D. R. (1964). An analysis of transformations. \textit{Journal of the Royal Statistical Society: Series B}, 26(2), 211--252.
+
+\bibitem{white1980}
+White, H. (1980). A heteroskedasticity-consistent covariance matrix estimator and a direct test for heteroskedasticity. \textit{Econometrica}, 48(4), 817--838.
+
+\bibitem{huber1964}
+Huber, P. J. (1964). Robust estimation of a location parameter. \textit{The Annals of Mathematical Statistics}, 35(1), 73--101.
+
+\bibitem{ljungbox1978}
+Ljung, G. M., \& Box, G. E. P. (1978). On a measure of lack of fit in time series models. \textit{Biometrika}, 65(2), 297--303.
+
+\bibitem{littleRubin2019}
+Little, R. J. A., \& Rubin, D. B. (2019).
+\textit{Statistical Analysis with Missing Data} (3rd ed.). Wiley.
 
 \end{thebibliography}
 

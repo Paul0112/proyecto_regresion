@@ -1,0 +1,23 @@
+Término,VIF
+I(z_depth ** 2),6.651574427286714
+z_depth,5.998610159210844
+I(z_log_gap ** 2),3.0522897973327914
+z_log_nst:z_log_gap,3.004208990380237
+I(z_longitude ** 2),2.408766301670262
+z_longitude,2.1826879230632934
+z_log_nst,1.9853380942134637
+z_log_gap,1.866119456679415
+z_log_dmin,1.7420207612610223
+z_depth:z_longitude,1.7163590654747116
+I(z_log_dmin ** 2),1.6992989288409277
+z_latitude,1.5720971790833254
+"C(magType_grouped, Treatment(reference='mb'))[T.mww]",1.5604841879240228
+z_latitude:z_longitude,1.2619040627862126
+I(z_latitude ** 2),1.1711884879448173
+"C(magType_grouped, Treatment(reference='mb'))[T.mwr]",1.1607662698175354
+"C(magType_grouped, Treatment(reference='mb'))[T.mw]",1.142460163654032
+z_log_nst:z_log_dmin,1.1397630051776526
+"C(magType_grouped, Treatment(reference='mb'))[T.ml]",1.0845996112684704
+z_rms,1.0790891245558916
+"C(magType_grouped, Treatment(reference='mb'))[T.md]",1.0516533882673897
+"C(magType_grouped, Treatment(reference='mb'))[T.Other]",1.0024197446815628

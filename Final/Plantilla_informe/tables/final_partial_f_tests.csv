@@ -1,0 +1,4 @@
+Comparación,gl adicionales,F,p-valor,Decisión
+G1 vs G2: curvatura,7,80.836,<0.001,Aporta
+G2 vs G3: interacciones,5,44.45,<0.001,Aporta
+G final vs G3: términos removidos,3,1.829,0.140,No aporta en conjunto

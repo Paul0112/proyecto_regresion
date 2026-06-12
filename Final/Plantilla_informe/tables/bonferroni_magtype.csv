@@ -1,0 +1,7 @@
+Nivel vs mb,Diferencia,IC simultáneo inferior,IC simultáneo superior,Excluye 0
+mww,0.4313,0.4001,0.4625,Sí
+mwr,-0.1895,-0.2185,-0.1604,Sí
+ml,0.1334,-0.0151,0.2818,No
+mw,-0.1043,-0.3055,0.0968,No
+md,0.0516,-0.0228,0.126,No
+Other,0.3336,-0.3178,0.985,No

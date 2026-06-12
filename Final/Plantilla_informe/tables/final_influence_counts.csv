@@ -1,0 +1,7 @@
+Regla orientativa,Eventos señalados,Porcentaje
+Leverage > 2p/n,907,6.42
+Cook > 4/n,739,5.23
+|Residuo externo| > 3,147,1.04
+|DFFITS| > 2sqrt(p/n),740,5.24
+max |DFBETAS| > 2/sqrt(n),4051,28.68
+|COVRATIO-1| > 3p/n,885,6.27

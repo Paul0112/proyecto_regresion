@@ -1,0 +1,12 @@
+\begin{tabular}{lrl}
+\toprule
+revisión & n\_casos & comentario \\
+\midrule
+mag < 4 & 0 & La muestra del proyecto debiera estar truncada en magnitud >= 4. \\
+latitude fuera de [-90, 90] & 0 & Latitudes fuera de rango geográfico plausible. \\
+longitude fuera de [-180, 180] & 0 & Longitudes fuera del rango geográfico usual. \\
+depth < 0 & 1 & Profundidades levemente negativas pueden aparecer por incertidumbre de estimación; se reportan, no se eliminan automáticamente. \\
+gap fuera de [0, 360] & 52 & La brecha azimutal debería estar entre 0 y 360 grados si está disponible. \\
+rms < 0 & 0 & El RMS debería ser no negativo si está disponible. \\
+\bottomrule
+\end{tabular}

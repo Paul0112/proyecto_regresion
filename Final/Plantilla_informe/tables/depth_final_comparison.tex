@@ -1,0 +1,11 @@
+\begin{tabular}{lrrrrrr}
+\toprule
+Especificación & Parámetros & R2 ajustado & AIC & BIC & RMSE & CV RMSE \\
+\midrule
+depth lineal & 22 & 0.666 & -3026.340 & -2860.117 & 0.217 & 0.218 \\
+depth + depth² & 23 & 0.671 & -3248.864 & -3075.085 & 0.215 & 0.216 \\
+log1p(depth.clip(0)) lineal & 22 & 0.665 & -2966.144 & -2799.920 & 0.217 & 0.218 \\
+log1p(depth.clip(0)) + cuadrado & 23 & 0.671 & -3230.032 & -3056.252 & 0.215 & 0.216 \\
+log1p(depth) + cuadrado & 23 & 0.671 & -3230.001 & -3056.222 & 0.215 & 0.216 \\
+\bottomrule
+\end{tabular}

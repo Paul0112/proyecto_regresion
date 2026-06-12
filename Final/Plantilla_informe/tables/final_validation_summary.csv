@@ -1,0 +1,7 @@
+Esquema,Modelo,RMSE,MAE,R2,SD_RMSE,SD_R2
+CV aleatoria 5-fold,G final,0.2161,0.1585,0.6693,0.0042,0.0024
+CV aleatoria 5-fold,M4 base,0.2312,0.1708,0.6216,0.0051,0.0107
+CV por región 5-fold,G final,0.2252,0.1653,0.6329,0.0239,0.0637
+CV por región 5-fold,M4 base,0.236,0.1741,0.5967,0.0221,0.0655
+Corte temporal 80/20,G final,0.2259,0.163,0.6385,0.0,0.0
+Corte temporal 80/20,M4 base,0.237,0.1743,0.6022,0.0,0.0

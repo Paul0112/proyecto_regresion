@@ -1,0 +1,8 @@
+Variable,Valor de referencia,Mínimo observado,Máximo observado,Dentro del rango
+depth,92.6402,-0.07,671.043,True
+latitude,3.2441,-65.3009,86.6053,True
+longitude,33.9582,-179.9991,179.9984,True
+nst,38.4707,7.0,619.0,True
+gap,96.5062,10.0,343.0,True
+dmin,2.5241,0.0,62.558,True
+rms,0.7067,0.0,1.74,True

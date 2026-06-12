@@ -60,11 +60,6 @@
 
 \vspace{0.2cm}
 
-\subsection*{Resumen técnico}
-
-Sobre 14.124 eventos con información completa, la especificación final conserva \var{mag} en su escala original y utiliza profundidad estandarizada con término cuadrático, controles espaciales, transformaciones $\log(x+1)$ para \var{nst}, \var{gap} y \var{dmin}, \var{rms} sin transformar e indicadores de \var{magType}. Esta forma mejora el ajuste y la validación respecto de M4 ($R^2$ ajustado 0.6715; CV-RMSE 0.216), pero no elimina heterocedasticidad, colas residuales pesadas ni dependencia geográfica o temporal.
-
-Por ello, la inferencia principal emplea errores estándar HC3 y se contrasta con agrupación por región. Las conclusiones describen asociaciones promedio dentro del catálogo USGS 2024 truncado en magnitud 4; no establecen causalidad ni permiten anticipar sismos.
 
 %%%%%%%%%%%%%%%%% 1. PREGUNTA Y CONTEXTO %%%%%%%%%%%%%%%%%
 \section{Pregunta y contexto}
@@ -337,6 +332,63 @@ Las distribuciones de predictores complementan esta lectura (Figura 2): \var{log
 %%%%%%%%%%%%%%%%% 4. MODELACIÓN E INFERENCIA %%%%%%%%%%%%%%%%%
 \section{Modelación e inferencia}
 
+
+\subsection{Plan de modelos}
+
+Para la modelación de la regresión múltiple se considera una secuencia de modelos lineales anidados interpretables. M1 evalúa la asociación marginal con profundidad transformada; M2 agrega ubicación básica mediante latitud y longitud; M3 incorpora variables técnicas del registro; M4 agrega diferencias promedio por tipo de magnitud; M5 revisa si la red de reporte captura diferencias adicionales; y M6 permite una relación espacial flexible con términos cuadráticos e interacción latitud-longitud, sin salir del marco de regresión lineal. Estas comparaciones evalúan qué bloque de variables aporta evidencia preliminar, controlando por las demás variables incluidas.
+
+\begin{table}[H]
+    \centering
+    \caption{Bloques de modelos lineales candidatos y propósito estadístico}
+    \label{tab:bloques_modelos}
+    \scriptsize
+    \begin{tabularx}{\textwidth}{llX}
+    \toprule
+    \textbf{Modelo} & \textbf{Bloque agregado} & \textbf{Propósito estadístico} \\
+    \midrule
+    \textbf{M1} & \var{log\_depth\_plus\_1} & Evaluar la asociación marginal entre profundidad y magnitud. \\
+    \textbf{M2} & \textbf{M1} + \var{latitude} + \var{longitude} & Controlar por localización espacial lineal. \\
+    \textbf{M3} & \textbf{M2} + \var{nst} + \var{gap} + \var{dmin} + \var{rms} & Agregar cobertura y ajuste técnico del registro. \\
+    \textbf{M4} & \textbf{M3} + \var{magType\_grouped} & Estimar diferencias promedio según el método de magnitud reportado. \\
+    \textbf{M5} & \textbf{M4} + \var{net\_grouped} & Evaluar diferencias adicionales asociadas con la red reportante. \\
+    \textbf{M6} & \textbf{M4} + \var{latitude}$^2$ + \var{longitude}$^2$ + (\var{latitude} $\times$ \var{longitude}) & Permitir una asociación espacial no estrictamente lineal (curvatura e interacción). \\
+    \bottomrule
+    \end{tabularx}
+\end{table}
+
+%{\reporttablesize
+%\input{tables/model_comparison.tex} MISMA TABLA QUE ABAJO
+%}
+
+
+\begin{table}[H]
+    \centering
+    \caption{Comparación de rendimiento y criterios de información de los modelos estimados}
+    \scriptsize
+    \setlength{\tabcolsep}{12pt} 
+    \begin{tabular}{lccccccc}
+    \toprule
+    \textbf{Modelo} & \textbf{n} & \textbf{Parámetros} & \textbf{R² ajust.} & \textbf{AIC} & \textbf{BIC} & \textbf{RMSE} & \textbf{MAE} \\
+    \midrule
+    \textbf{M1} & 14176 & 2  & 0.028 & 12096.022 & 12111.141 & 0.371 & 0.268 \\
+    \textbf{M2} & 14176 & 4  & 0.048 & 11801.695 & 11831.933 & 0.367 & 0.264 \\
+    \textbf{M3} & 14124 & 8  & 0.535 & 1633.633  & 1694.079  & 0.256 & 0.184 \\
+    \textbf{M4} & 14124 & 15 & 0.624 & -1361.202 & -1247.868 & 0.230 & 0.170 \\
+    \textbf{M5} & 14124 & 22 & 0.625 & -1390.252 & -1224.028 & 0.230 & 0.170 \\
+    \textbf{M6} & 14124 & 18 & 0.633 & -1688.352 & -1552.351 & 0.228 & 0.168 \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+
+Respecto al análisis del rendimiento de los modelos en la Tabla 7 se puede evidenciar una evolución crucial en la capacidad predictiva. Los modelos puramente geofísicos iniciales (\textbf{M1} y \textbf{M2}) muestran un ajuste sumamente pobre, con un $R^2$ ajustado inferior al 5\%. Sin embargo, al anidar el modelo \textbf{M3} se reduce el AIC de manera drástica (de $11801.695$ a $1633.633$) y el $R^2$ ajustado aumenta hasta $0.535$, presentando una clara evidencia que no bastan las características físicas del evento para un buen rendimiento; la calidad y la geometría que la red de captura (variables instrumentales) son determinantes en la variabilidad de la magnitud reportada.
+
+
+Luego, el rendimiento se comienza a consolidar en los bloques superiores. Al introducir los controles metodológicos del tipo de magnitud (\textbf{M4}), los criterios de información logran valores negativos, indicando un ajuste superior. Al analizar la incorporación de las redes de reporte en el \textbf{M5}, podemos apreciar un leve sobreajuste, ya que a pesar de aumentar a 22 parámetros, el (\textit{BIC}) empeora de $-1247.868$ a $-1224.028$, lo que nos sugiere que la incorporación de las distrintas agencias que evaluan el sismo no añade un valor predictivo real. Finalmente, el modelo que permite modelar la curvatura espacial \textbf{M6} resulta el más eficiente del catálogo, alcanzando el menor AIC ($-1688.352$) y el menor BIC ($-1552.351$) y con una reducción de 4 parámetros respecto al anterior.
+
+
+La comparación preliminar sugiere mejoras importantes al pasar de modelos puramente geográficos a modelos con variables técnicas y tipo de magnitud. Sin embargo, el modelo final no se escogerá solo por R2 o AIC/BIC: se priorizará interpretabilidad, diagnóstico de supuestos, colinealidad, observaciones influyentes y estabilidad ante categorías agrupadas. Dentro de esta etapa, \textbf{M4} (como modelo lineal parsimonioso e interpretable) y el \textbf{M6} (como modelo más robusto) se establecen como los candidatos naturales para la fases siguientes de diagnósticos.
+
 \subsection{Modelo general y supuestos}
 
 Se trabaja con $\mathbf Y=\mathbf X\boldsymbol\beta+\boldsymbol\varepsilon$. El modelo es lineal en $\boldsymbol\beta$ aunque incluya cuadrados e interacciones. MCO proyecta $\mathbf Y$ ortogonalmente sobre $C(\mathbf X)$ mediante $\mathbf H=\mathbf X(\mathbf X^{\top}\mathbf X)^{-1}\mathbf X^{\top}$; el modelo con solo intercepto corresponde a $\mathbf H_0=\mathbf J_n/n$ y permite la descomposición $SCT=SCR+SCE$ \cite{montgomery2021}. El modelo nulo se usa como referencia geométrica, no como candidato sustantivo.
@@ -555,6 +607,13 @@ El notebook \path{avance_proyecto_corregido.ipynb} genera la base procesada \pat
 
 \section*{Declaración de uso de herramientas de IA}
 Se utilizaron herramientas de inteligencia artificial para apoyar la mejora de gráficos en Python, la fluidez de redacción y el orden y disposición de tablas e imágenes en LaTeX. Las decisiones metodológicas, la ejecución y la interpretación de resultados fueron revisadas por los autores.
+
+\subsection*{Resumen técnico}
+
+Sobre 14.124 eventos con información completa, la especificación final conserva \var{mag} en su escala original y utiliza profundidad estandarizada con término cuadrático, controles espaciales, transformaciones $\log(x+1)$ para \var{nst}, \var{gap} y \var{dmin}, \var{rms} sin transformar e indicadores de \var{magType}. Esta forma mejora el ajuste y la validación respecto de M4 ($R^2$ ajustado 0.6715; CV-RMSE 0.216), pero no elimina heterocedasticidad, colas residuales pesadas ni dependencia geográfica o temporal.
+
+Por ello, la inferencia principal emplea errores estándar HC3 y se contrasta con agrupación por región. Las conclusiones describen asociaciones promedio dentro del catálogo USGS 2024 truncado en magnitud 4; no establecen causalidad ni permiten anticipar sismos.
+
 
 %%%%%%%%%%%%%%%%% REFERENCIAS %%%%%%%%%%%%%%%%%
 

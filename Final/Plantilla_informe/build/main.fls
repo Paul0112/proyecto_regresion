@@ -1,8 +1,8 @@
-PWD /Users/mardrouilly/Años universidad/2026-1/Análisis de regresion/proyecto_regresion/Avance/Plantilla_informe
+PWD /Users/mardrouilly/Años universidad/2026-1/Análisis de regresion/proyecto_regresion/Final/Plantilla_informe
 INPUT /usr/local/texlive/2026/texmf.cnf
 INPUT /usr/local/texlive/2026/texmf-dist/web2c/texmf.cnf
 INPUT /usr/local/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT /Users/mardrouilly/Años universidad/2026-1/Análisis de regresion/proyecto_regresion/Avance/Plantilla_informe/main.tex
+INPUT /Users/mardrouilly/Años universidad/2026-1/Análisis de regresion/proyecto_regresion/Final/Plantilla_informe/main.tex
 OUTPUT build/main.log
 INPUT ./style.cls
 INPUT style.cls

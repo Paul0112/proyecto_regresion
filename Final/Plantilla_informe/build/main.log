@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.22)  26 MAY 2026 18:27
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.22)  13 JUN 2026 20:14
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**"/Users/mardrouilly/Años universidad/2026-1/Análisis de regresion/proyecto_regresion/Avance/Plantilla_informe/main.tex"
-(/Users/mardrouilly/Años universidad/2026-1/Análisis de regresion/proyecto_regresion/Avance/Plantilla_informe/main.tex
+**"/Users/mardrouilly/Años universidad/2026-1/Análisis de regresion/proyecto_regresion/Final/Plantilla_informe/main.tex"
+(/Users/mardrouilly/Años universidad/2026-1/Análisis de regresion/proyecto_regresion/Final/Plantilla_informe/main.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
 (./style.cls
@@ -123,10 +123,10 @@ l.101 \msg_fatal:nn {fontspec} {cannot-use-pdftex}
  
 Here is how much of TeX's memory you used:
  2520 strings out of 467525
- 45068 string characters out of 5418982
+ 45065 string characters out of 5418982
  461002 words of memory out of 5000000
  31468 multiletter control sequences out of 15000+600000
  628021 words of font info for 41 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 88i,0n,91p,440b,365s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 88i,0n,91p,439b,365s stack positions out of 10000i,1000n,20000p,200000b,200000s
 /usr/local/texlive/2026/texmf-dist/tex/latex/fontspec/fontspec.sty:101:  ==> Fatal error occurred, no output PDF file produced!

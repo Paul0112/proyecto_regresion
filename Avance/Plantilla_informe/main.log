@@ -1,7 +1,6 @@
-This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex 2026.3.22)  27 MAY 2026 19:40
+This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex 2026.3.22)  13 JUN 2026 20:29
 entering extended mode
  restricted \write18 enabled.
- file:line:error style messages enabled.
  %&-line parsing enabled.
 **main.tex
 (./main.tex
@@ -1739,7 +1738,7 @@ File: ./figures/fig_box_mag_magtype.png Graphic file (type bmp)
 <./figures/fig_box_mag_magtype.png>
  [3] [4]
 (./tables/model_comparison.tex) [5] [6]
-runsystem(latexminted cleantemp  --timestamp 20260527194048 FAD58DE7366495DB465
+runsystem(latexminted cleantemp  --timestamp 20260613202927 FAD58DE7366495DB465
 0CFEFAC2FCD61)...executed safely (allowed).
 
  (./main.aux

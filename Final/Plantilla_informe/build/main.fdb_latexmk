@@ -1,6 +1,7 @@
 # Fdb version 4
-["pdflatex"] 1779834471.63442 "/Users/mardrouilly/Años universidad/2026-1/Análisis de regresion/proyecto_regresion/Avance/Plantilla_informe/main.tex" "build/main.pdf" "main" 1779834471.82379 2
-  "/Users/mardrouilly/Años universidad/2026-1/Análisis de regresion/proyecto_regresion/Avance/Plantilla_informe/main.tex" 1779832431.13678 11724 ca18f2c67806cc9b08fcde72f3532430 ""
+["pdflatex"] 1781396083.10008 "/Users/mardrouilly/Años universidad/2026-1/Análisis de regresion/proyecto_regresion/Final/Plantilla_informe/main.tex" "build/main.pdf" "main" 1781396083.27693 2
+  "/Users/mardrouilly/Años universidad/2026-1/Análisis de regresion/proyecto_regresion/Avance/Plantilla_informe/main.tex" 1779925239.73009 14445 11fd14fe85c12537de47243d8d708006 ""
+  "/Users/mardrouilly/Años universidad/2026-1/Análisis de regresion/proyecto_regresion/Final/Plantilla_informe/main.tex" 1781396077.21996 49620 e932e8689bb8cb236b855e8d7fc845b8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmr10.tfm" 1136768653 1296 45809c5a464d5f32c8f98ba97c1bb47f ""
   "/usr/local/texlive/2026/texmf-dist/tex/generic/babel-spanish/spanish.ldf" 1622145181 26965 3b6d1655ad716f98e788b1fb9f2e87b8 ""
@@ -22,9 +23,9 @@
   "/usr/local/texlive/2026/texmf-dist/web2c/texmf.cnf" 1770478701 43630 e9fa012910491fe5ae08a72c3c2997a7 ""
   "/usr/local/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1774209607 3636776 dc5fa9b6b1453b9d196cd42edf876004 ""
   "/usr/local/texlive/2026/texmf.cnf" 1774209515 577 648cd9f92f9c0eac486f4c71c85cfbbe ""
-  "build/main.aux" 1779834463.63385 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
-  "main.tex" 1779832431.13678 11724 ca18f2c67806cc9b08fcde72f3532430 ""
-  "style.cls" 1779742488 13438 488809c1d4ee76b7088a36b5f3090e89 ""
+  "build/main.aux" 0 -1 0 "pdflatex"
+  "main.tex" 1781396077.21996 49620 e932e8689bb8cb236b855e8d7fc845b8 ""
+  "style.cls" 1781199275.31046 13438 488809c1d4ee76b7088a36b5f3090e89 ""
   (generated)
   "build/main.aux"
   "build/main.log"

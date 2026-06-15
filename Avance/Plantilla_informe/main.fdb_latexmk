@@ -1,10 +1,10 @@
 # Fdb version 4
-["xdvipdfmx"] 1779925250.25377 "main.xdv" "main.pdf" "main" 1779925252.2325 0
-  "main.xdv" 1779925250.15837 141852 9dfd2da92832695312c40fa2e6919fef "xelatex"
+["xdvipdfmx"] 1781396969.44955 "main.xdv" "main.pdf" "main" 1781396971.44457 0
+  "main.xdv" 1781396969.34966 141852 c5c3e5c235922d49b4ae9cb235ec0ec3 "xelatex"
   (generated)
   "main.pdf"
   (rewritten before read)
-["xelatex"] 1779925248.68786 "main.tex" "main.xdv" "main" 1779925252.22992 0
+["xelatex"] 1781396967.77845 "main.tex" "main.xdv" "main" 1781396971.44218 0
   "/usr/local/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/jknappen/ec/ectt1000.tfm" 1136768653 1536 06717a2b50de47d4087ac0e6cd759455 ""
@@ -311,8 +311,8 @@
   "figures/fig_map_mag.png" 1779925198.45581 733362 428baa99f8624d5a492517cc8c47d583 ""
   "figures/fig_scatter_mag_logdepth.png" 1779925195.64154 472451 5c1046a7f0f4507b9c781ad808ec0bad ""
   "img/logo-uc-3.pdf" 1779742488 126396 2442e8daa0b56a71b8a92096a1f49bdc ""
-  "main.aux" 1779925250.15615 2262 f556e6f613fb3f40920ed496c8dd1f5e "xelatex"
-  "main.out" 1779925250.15808 976 0c8a68ddc39f65372001f5ca9882c54b "xelatex"
+  "main.aux" 1781396969.3475 2262 f556e6f613fb3f40920ed496c8dd1f5e "xelatex"
+  "main.out" 1781396969.34934 976 0c8a68ddc39f65372001f5ca9882c54b "xelatex"
   "main.tex" 1779925239.73009 14445 11fd14fe85c12537de47243d8d708006 ""
   "style.cls" 1779742488 13438 488809c1d4ee76b7088a36b5f3090e89 ""
   "tables/cleaning_summary.tex" 1779925192.52384 527 7ac8682273e013a5bcca4b29ffc70f53 ""
